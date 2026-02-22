@@ -1,7 +1,7 @@
 import "./App.css";
 import { useState } from "react";
 import Login from "./parts/Login/jsx/login";
-import LoginOption from "./parts/Login/jsx/loginoption";
+import LoginOption from "./components/Login/loginoption";
 import Register from "./parts/Login/jsx/register";
 import PetOwnerDashboard from "./parts/PetOwner/jsx/dashboard";
 import DoctorDashboard from "./parts/Doctor/jsx/dashboard";
