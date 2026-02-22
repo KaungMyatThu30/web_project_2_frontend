@@ -1,0 +1,938 @@
+.po-screen {
+    min-height: 100vh;
+    padding: 24px;
+    box-sizing: border-box;
+    background:
+      radial-gradient(circle at 8% 82%, rgba(235, 130, 65, 0.28) 0 70px, transparent 72px),
+      radial-gradient(circle at 92% 12%, rgba(229, 154, 68, 0.2) 0 54px, transparent 56px),
+      linear-gradient(180deg, #d5cdc9 0%, #d2cbc6 100%);
+  }
+   
+  .po-stage {
+    width: min(1200px, 100%);
+    margin: 0 auto;
+    font-family: 'Trebuchet MS', 'Gill Sans', 'Segoe UI', sans-serif;
+    color: #5b4a31;
+  }
+   
+  .po-hero {
+    position: relative;
+    min-height: 180px;
+    border-radius: 26px;
+    background:
+      radial-gradient(circle at 15% 25%, rgba(238, 150, 71, 0.85) 0 8px, transparent 9px),
+      radial-gradient(circle at 75% 12%, rgba(229, 105, 38, 0.9) 0 6px, transparent 7px),
+      linear-gradient(170deg, #f8f2e5 0%, #ece2cb 56%, #e2d8bc 100%);
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    box-shadow: 0 20px 32px rgba(116, 88, 57, 0.2);
+    overflow: hidden;
+  }
+   
+  .po-hero-dots span {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #f2bf58;
+  }
+   
+  .po-hero-dots span:nth-child(1) {
+    top: 20px;
+    left: 24px;
+  }
+   
+  .po-hero-dots span:nth-child(2) {
+    top: 38px;
+    right: 45px;
+    background: #d9642a;
+  }
+   
+  .po-hero-dots span:nth-child(3) {
+    bottom: 26px;
+    left: 42px;
+    background: #ec9738;
+  }
+   
+  .po-hero-dots span:nth-child(4) {
+    bottom: 28px;
+    right: 28px;
+  }
+   
+  .po-hero-title {
+    margin: 0;
+    font-size: clamp(30px, 5vw, 50px);
+    letter-spacing: 0.12em;
+  }
+   
+  .po-hero-subtitle {
+    margin: 8px 0 0;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.8;
+  }
+   
+  .po-panel {
+    margin-top: 20px;
+    background: #f1eadc;
+    border-radius: 20px;
+    padding: 18px;
+    display: grid;
+    gap: 18px;
+    box-shadow: 0 18px 28px rgba(109, 83, 57, 0.18);
+  }
+   
+  .po-sidebar {
+    background: #f7f4ef;
+    border-radius: 18px;
+    padding: 16px;
+    border: 1px solid #ece1cd;
+  }
+   
+  .po-sidebar-brand {
+    margin: 0 0 14px;
+    font-size: 20px;
+    font-weight: 800;
+  }
+   
+  .po-sidebar nav {
+    display: grid;
+    gap: 8px;
+  }
+   
+  .po-side-link {
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: #706251;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: left;
+  }
+   
+  .po-side-link:hover {
+    background: rgba(236, 212, 168, 0.36);
+  }
+   
+  .po-side-link.is-active {
+    background: #f1d36e;
+    color: #503e22;
+  }
+   
+  .po-side-illustration {
+    margin-top: 22px;
+    border-radius: 16px;
+    background: linear-gradient(170deg, #fbe39e 0%, #f4bf73 100%);
+    min-height: 140px;
+    display: grid;
+    place-items: center;
+    font-size: 54px;
+  }
+   
+  .po-main {
+    min-width: 0;
+  }
+   
+  .po-main-top {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+   
+  .po-add-pet {
+    border: 0;
+    border-radius: 8px;
+    background: #6e7783;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 8px 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+  }
+   
+  .po-profile {
+    border: 0;
+    border-radius: 999px;
+    background: #fff8ea;
+    color: #5d503f;
+    padding: 8px 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+   
+  .po-profile strong {
+    font-size: 13px;
+  }
+   
+  .po-card-grid {
+    display: grid;
+    gap: 14px;
+  }
+   
+  .po-card {
+    border-radius: 18px;
+    background:
+      radial-gradient(circle at 100% 100%, rgba(233, 173, 66, 0.35) 0 90px, transparent 92px),
+      linear-gradient(180deg, #efcb62 0%, #e8bf55 100%);
+    box-shadow: 0 10px 18px rgba(130, 98, 33, 0.25);
+    padding: 16px;
+    color: #6a552f;
+  }
+   
+  .po-card h3 {
+    margin: 0;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+   
+  .po-detail-list,
+  .po-note-list {
+    list-style: none;
+    padding: 0;
+    margin: 12px 0 0;
+  }
+   
+  .po-detail-list li {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 12px;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(107, 83, 39, 0.18);
+  }
+   
+  .po-detail-list span {
+    opacity: 0.8;
+  }
+   
+  .po-detail-list strong {
+    text-align: right;
+  }
+   
+  .po-appointment-id {
+    margin: 4px 0 0;
+    font-size: 11px;
+    color: #7a6641;
+    font-family: 'Courier New', Courier, monospace;
+    word-break: break-all;
+  }
+   
+  .po-detail-list .po-appointment-id {
+    flex-basis: 100%;
+    text-align: right;
+    margin-top: 2px;
+  }
+   
+  .po-note-list li {
+    font-size: 12px;
+    line-height: 1.45;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(107, 83, 39, 0.18);
+  }
+   
+  .po-quick-actions {
+    margin-top: 12px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+   
+  .po-quick-actions button {
+    margin-top: 0;
+    flex: 1;
+    min-width: 150px;
+    border: 0;
+    border-radius: 10px;
+    background: #9f7a20;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    min-height: 34px;
+    cursor: pointer;
+  }
+   
+  .po-placeholder {
+    border-radius: 16px;
+    background: linear-gradient(180deg, #f1d37c 0%, #e7be5a 100%);
+    min-height: 320px;
+    padding: 24px;
+    color: #604e2f;
+  }
+   
+  .po-placeholder h2 {
+    margin: 0;
+  }
+   
+  .po-placeholder p {
+    margin: 8px 0 0;
+    font-size: 15px;
+  }
+   
+  .po-mypets {
+    display: grid;
+    gap: 14px;
+  }
+   
+  .po-mypets-subtitle {
+    margin: 10px 0 0;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+   
+  .po-mypets-add-btn {
+    margin-top: 14px;
+    border: 0;
+    border-radius: 10px;
+    background: #9f7a20;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    min-height: 38px;
+    padding: 0 14px;
+    cursor: pointer;
+  }
+   
+  .po-mypets-grid {
+    display: grid;
+    gap: 14px;
+  }
+   
+  .po-mypet-card h3 {
+    margin-bottom: 10px;
+  }
+   
+  .po-pet-photo {
+    width: 100%;
+    max-width: 220px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid rgba(126, 94, 34, 0.22);
+    background: rgba(255, 246, 219, 0.8);
+    margin-bottom: 10px;
+  }
+   
+  .po-pet-photo-placeholder {
+    display: grid;
+    place-items: center;
+    font-size: 28px;
+    color: #9f7a20;
+  }
+   
+  .po-file-input-hidden {
+    display: none;
+  }
+   
+  .po-mypet-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+   
+  .po-history-list .po-mypet-actions {
+    margin-bottom: 0;
+  }
+   
+  .po-mypet-actions button {
+    border: 0;
+    border-radius: 8px;
+    background: #7f6420;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    min-height: 32px;
+    padding: 0 10px;
+    cursor: pointer;
+  }
+   
+  .po-history-head {
+    display: none;
+  }
+   
+  .po-history-list {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0 0;
+    display: grid;
+    gap: 8px;
+  }
+   
+  .po-history-list li {
+    border-radius: 10px;
+    background: rgba(255, 246, 219, 0.8);
+    border: 1px solid rgba(126, 94, 34, 0.18);
+    padding: 10px;
+    display: grid;
+    gap: 6px;
+  }
+   
+  .po-history-list span,
+  .po-history-list strong {
+    font-size: 12px;
+  }
+   
+  .po-history-list strong {
+    font-weight: 800;
+  }
+   
+  .po-status {
+    justify-self: start;
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-style: normal;
+    font-weight: 800;
+  }
+   
+  .po-status-completed {
+    background: #dff2d4;
+    color: #2e6b2e;
+  }
+   
+  .po-status-pending {
+    background: #fff2c7;
+    color: #8c6700;
+  }
+   
+  .po-status-confirmed {
+    background: #d5ecff;
+    color: #1f5d8b;
+  }
+   
+  .po-status-cancelled {
+    background: #ffd9d9;
+    color: #9e2e2e;
+  }
+   
+  .po-history-list button {
+    justify-self: start;
+    border: 0;
+    border-radius: 8px;
+    background: #7f6420;
+    color: #fff;
+    min-height: 30px;
+    padding: 0 10px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+   
+  .po-appointment-details {
+    border: 1px solid rgba(126, 94, 34, 0.22);
+  }
+   
+  .po-book-layout {
+    display: grid;
+    gap: 12px;
+  }
+   
+  .po-book-grid {
+    display: grid;
+    gap: 8px;
+  }
+   
+  .po-book-grid label {
+    display: grid;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+   
+  .po-book-grid input,
+  .po-book-grid select,
+  .po-book-grid textarea {
+    border: 1px solid rgba(126, 94, 34, 0.26);
+    border-radius: 8px;
+    background: rgba(255, 248, 229, 0.85);
+    min-height: 34px;
+    padding: 0 10px;
+    font: inherit;
+    color: #5b4a31;
+  }
+   
+  .po-book-grid textarea {
+    min-height: auto;
+    padding: 10px;
+    resize: vertical;
+  }
+   
+  .po-book-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+   
+  .po-form-success {
+    margin: 6px 0 0;
+    font-size: 12px;
+    font-weight: 700;
+    color: #1f6a47;
+  }
+   
+  .po-form-error {
+    margin: 6px 0 0;
+    font-size: 12px;
+    font-weight: 700;
+    color: #8b3131;
+  }
+   
+  .po-medical-layout {
+    display: grid;
+    gap: 14px;
+  }
+   
+  .po-medical-summary {
+    display: grid;
+    gap: 8px;
+  }
+   
+  .po-medical-stat {
+    border-radius: 10px;
+    border: 1px solid rgba(126, 94, 34, 0.18);
+    background: rgba(255, 246, 219, 0.8);
+    padding: 10px;
+  }
+   
+  .po-medical-stat p {
+    margin: 0;
+    font-size: 12px;
+  }
+   
+  .po-medical-stat strong {
+    margin-top: 4px;
+    display: block;
+    font-size: 16px;
+  }
+   
+  .po-medical-filters {
+    margin-top: 10px;
+    display: grid;
+    gap: 8px;
+  }
+   
+  .po-medical-filters label {
+    display: grid;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+   
+  .po-medical-filters input,
+  .po-medical-filters select {
+    border: 1px solid rgba(126, 94, 34, 0.26);
+    border-radius: 8px;
+    background: rgba(255, 248, 229, 0.85);
+    min-height: 34px;
+    padding: 0 10px;
+    font: inherit;
+    color: #5b4a31;
+  }
+   
+  .po-medical-visit-list {
+    list-style: none;
+    margin: 10px 0 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+  }
+   
+  .po-medical-visit-list li {
+    border-radius: 10px;
+    background: rgba(255, 246, 219, 0.8);
+    border: 1px solid rgba(126, 94, 34, 0.18);
+    padding: 10px;
+    display: grid;
+    gap: 8px;
+  }
+   
+  .po-medical-visit-list strong {
+    font-size: 13px;
+  }
+   
+  .po-medical-visit-list p {
+    margin: 4px 0 0;
+    font-size: 12px;
+    line-height: 1.45;
+  }
+   
+  .po-medical-visit-list button {
+    justify-self: start;
+    border: 0;
+    border-radius: 8px;
+    background: #7f6420;
+    color: #fff;
+    min-height: 30px;
+    padding: 0 10px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+   
+  .po-record-list {
+    list-style: none;
+    margin: 10px 0 0;
+    padding: 0;
+    display: grid;
+    gap: 10px;
+  }
+   
+  .po-record-list li {
+    border-radius: 10px;
+    background: rgba(255, 246, 219, 0.8);
+    border: 1px solid rgba(126, 94, 34, 0.18);
+    padding: 10px;
+  }
+   
+  .po-record-list h4 {
+    margin: 0;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+   
+  .po-record-list p {
+    margin: 6px 0 0;
+    font-size: 12px;
+    line-height: 1.45;
+  }
+   
+  .po-record-download {
+    margin-top: 12px;
+    border: 0;
+    border-radius: 10px;
+    background: #7f6420;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    min-height: 36px;
+    padding: 0 14px;
+    cursor: pointer;
+  }
+   
+  .po-record-actions {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+   
+  .po-record-download {
+    margin-top: 0;
+  }
+   
+  .po-record-secondary {
+    border: 1px solid rgba(126, 94, 34, 0.28);
+    border-radius: 10px;
+    background: rgba(255, 248, 229, 0.88);
+    color: #6a552f;
+    font-size: 12px;
+    font-weight: 700;
+    min-height: 36px;
+    padding: 0 14px;
+    cursor: pointer;
+  }
+   
+  .po-profile-layout {
+    display: grid;
+    gap: 14px;
+  }
+   
+  .po-profile-summary {
+    display: grid;
+    gap: 12px;
+    align-items: center;
+  }
+   
+  .po-profile-avatar {
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: #8d6d1d;
+    color: #fff;
+    font-size: 22px;
+    font-weight: 800;
+    overflow: hidden;
+  }
+   
+  .po-profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+   
+  .po-profile-summary h4 {
+    margin: 0;
+    font-size: 18px;
+  }
+   
+  .po-profile-summary p {
+    margin: 4px 0 0;
+    font-size: 12px;
+  }
+   
+  .po-profile-badge {
+    width: fit-content;
+    border-radius: 999px;
+    background: rgba(127, 100, 32, 0.18);
+    color: #6a552f;
+    padding: 6px 10px;
+    font-size: 11px;
+    font-weight: 800;
+  }
+   
+  .po-profile-form {
+    margin-top: 10px;
+    display: grid;
+    gap: 8px;
+  }
+   
+  .po-profile-form label {
+    display: grid;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #6a552f;
+  }
+   
+  .po-profile-form input,
+  .po-profile-form select {
+    border: 1px solid rgba(126, 94, 34, 0.26);
+    border-radius: 8px;
+    background: rgba(255, 248, 229, 0.85);
+    min-height: 34px;
+    padding: 0 10px;
+    font: inherit;
+    color: #5b4a31;
+  }
+   
+  .po-profile-save {
+    margin-top: 12px;
+    border: 0;
+    border-radius: 10px;
+    background: #7f6420;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    min-height: 36px;
+    padding: 0 14px;
+    cursor: pointer;
+  }
+   
+  .po-pref-list {
+    margin-top: 10px;
+    display: grid;
+    gap: 8px;
+  }
+   
+  .po-pref-list label {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 700;
+  }
+   
+  .po-pref-list input {
+    accent-color: #8d6d1d;
+  }
+   
+  .po-security-actions {
+    margin-top: 10px;
+    display: grid;
+    gap: 8px;
+  }
+   
+  .po-security-actions button {
+    border: 0;
+    border-radius: 8px;
+    background: #7f6420;
+    color: #fff;
+    min-height: 34px;
+    padding: 0 10px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+   
+  .po-profile-list {
+    list-style: none;
+    margin: 10px 0 0;
+    padding: 0;
+    display: grid;
+    gap: 10px;
+  }
+   
+  .po-profile-list li {
+    border-radius: 10px;
+    background: rgba(255, 246, 219, 0.8);
+    border: 1px solid rgba(126, 94, 34, 0.18);
+    padding: 10px;
+    display: grid;
+    gap: 8px;
+  }
+   
+  .po-profile-list h4 {
+    margin: 0;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+   
+  .po-profile-list p {
+    margin: 4px 0 0;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+   
+  .po-profile-list button {
+    justify-self: start;
+    border: 0;
+    border-radius: 8px;
+    background: #7f6420;
+    color: #fff;
+    min-height: 30px;
+    padding: 0 10px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+   
+  @media (min-width: 860px) {
+    .po-panel {
+      grid-template-columns: 220px minmax(0, 1fr);
+      align-items: start;
+    }
+   
+    .po-card-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+   
+    .po-mypets-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+   
+    .po-book-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+   
+    .po-book-full {
+      grid-column: 1 / -1;
+    }
+   
+    .po-medical-layout {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+   
+    .po-medical-summary {
+      grid-column: 1 / -1;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+   
+    .po-medical-filters {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+   
+    .po-medical-visit-list li {
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 10px;
+    }
+   
+    .po-profile-layout {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+   
+    .po-profile-summary {
+      grid-column: 1 / -1;
+      grid-template-columns: auto 1fr auto;
+    }
+   
+    .po-profile-form {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+   
+    .po-profile-full {
+      grid-column: 1 / -1;
+    }
+   
+    .po-history-head {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr 0.8fr 280px;
+      gap: 10px;
+      padding: 0 10px 8px;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+   
+    .po-history-head span:last-child {
+      text-align: right;
+    }
+   
+    .po-history-list li {
+      grid-template-columns: 1fr 1.2fr 0.8fr 280px;
+      align-items: center;
+      gap: 10px;
+    }
+   
+    .po-history-list .po-mypet-actions {
+      justify-self: end;
+    }
+   
+    .po-history-list button {
+      justify-self: end;
+    }
+   
+    .po-profile-list li {
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 14px;
+    }
+  }
+   
+  @media (max-width: 580px) {
+    .po-screen {
+      padding: 14px;
+    }
+   
+    .po-hero {
+      min-height: 140px;
+    }
+   
+    .po-hero-title {
+      letter-spacing: 0.05em;
+    }
+   
+    .po-quick-actions button {
+      min-width: 100%;
+    }
+  }
