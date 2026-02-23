@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "../css/dashboard.css";
+import logoImage from "../../../../images/Web_Logo.png";
 import {
   addDoctorAvailableSlot,
   addDoctorBlockedSlot,
@@ -902,6 +903,7 @@ export default function DoctorDashboard({ currentUser, onLogout }) {
     <main className="dr-screen">
       <section className="dr-shell">
         <aside className="dr-sidebar">
+          <img className="dr-mini-logo" src={logoImage} alt="PawEver logo" />
           <h1>PawEver Doctor</h1>
           <nav aria-label="Doctor navigation">
             {DOCTOR_PAGES.map((page) => (

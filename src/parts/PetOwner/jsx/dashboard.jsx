@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "../css/dashboard.css";
+import logoImage from "../../../../images/Web_Logo.png";
 import {
   changeUserPassword,
   createAppointment,
@@ -54,9 +55,34 @@ function getSortedAppointments(appointments, order = "desc") {
   });
 }
 
-function DashboardCards({ pets, appointments, onBookAppointment, onAddPet }) {
+function formatNotificationChannels(preferredContact, includeEmailEligible = true) {
+  const channels = ["In-app"];
+  if (
+    includeEmailEligible &&
+    String(preferredContact || "").trim().toLowerCase() === "email"
+  ) {
+    channels.push("Email");
+  }
+  return channels.join(" / ");
+}
+
+function DashboardCards({
+  pets,
+  appointments,
+  profile,
+  onBookAppointment,
+  onAddPet,
+}) {
   const todayStart = new Date();
   todayStart.setHours(0, 0, 0, 0);
+  const now = new Date();
+  const nowTs = now.getTime();
+  const upcomingReminderWindowTs = nowTs + 48 * 60 * 60 * 1000;
+  const appointmentReminderEnabled =
+    profile?.notificationPreferences?.appointmentReminders !== false;
+  const vaccinationReminderEnabled =
+    profile?.notificationPreferences?.vaccinationReminders !== false;
+  const reminderChannels = formatNotificationChannels(profile?.preferredContact);
   const upcomingAppointment =
     getSortedAppointments(
       appointments.filter((item) => {
@@ -77,6 +103,33 @@ function DashboardCards({ pets, appointments, onBookAppointment, onAddPet }) {
   const vaccineReminders = pets.filter(
     (pet) => String(pet.vaccinationStatus || "").toLowerCase() !== "up to date"
   );
+  const appointmentStatusNotifications = getSortedAppointments(
+    appointments.filter((item) => {
+      const status = String(item.status || "").toLowerCase();
+      return status === "confirmed" || status === "cancelled";
+    }),
+    "desc"
+  ).slice(0, 3);
+  const upcomingReminderAppointments = appointmentReminderEnabled
+    ? getSortedAppointments(
+        appointments.filter((item) => {
+          const status = String(item.status || "").toLowerCase();
+          if (status === "cancelled" || status === "completed") {
+            return false;
+          }
+          const ts = toTimestamp(
+            item.appointmentDate || item.date,
+            item.appointmentTime
+          );
+          return (
+            !Number.isNaN(ts) &&
+            ts >= nowTs &&
+            ts <= upcomingReminderWindowTs
+          );
+        }),
+        "asc"
+      ).slice(0, 2)
+    : [];
 
   return (
     <div className="po-card-grid">
@@ -170,11 +223,39 @@ function DashboardCards({ pets, appointments, onBookAppointment, onAddPet }) {
       <article className="po-card">
         <h3>Notifications</h3>
         <ul className="po-note-list">
-          <li>
-            {appointments.length} appointment(s) found in your account history.
-          </li>
-          <li>{pets.length} pet profile(s) linked to your account.</li>
-          <li>Use Appointment History to review status updates.</li>
+          {appointmentStatusNotifications.map((item) => (
+            <li key={`appt-status-${item.id}`}>
+              Appointment {String(item.status || "").toLowerCase()} for{" "}
+              {item.petName} with {item.doctorName} on{" "}
+              {formatAppointmentDate(item.appointmentDate || item.date)}
+              {item.appointmentTime ? `, ${item.appointmentTime}` : ""}. (In-app)
+            </li>
+          ))}
+
+          {vaccinationReminderEnabled
+            ? vaccineReminders.slice(0, 3).map((pet) => (
+                <li key={`vax-${pet.id}`}>
+                  Vaccination reminder: {pet.name} is marked{" "}
+                  {pet.vaccinationStatus}. ({reminderChannels})
+                </li>
+              ))
+            : null}
+
+          {upcomingReminderAppointments.map((item) => (
+            <li key={`upcoming-${item.id}`}>
+              Upcoming appointment reminder: {item.petName} with{" "}
+              {item.doctorName} on{" "}
+              {formatAppointmentDate(item.appointmentDate || item.date)}
+              {item.appointmentTime ? `, ${item.appointmentTime}` : ""}. (
+              {reminderChannels})
+            </li>
+          ))}
+
+          {!appointmentStatusNotifications.length &&
+          (!vaccinationReminderEnabled || !vaccineReminders.length) &&
+          !upcomingReminderAppointments.length ? (
+            <li>No new notifications right now.</li>
+          ) : null}
         </ul>
       </article>
     </div>
@@ -1827,6 +1908,7 @@ export default function PetOwnerDashboard({ role, currentUser, onLogout }) {
 
         <section className="po-panel">
           <aside className="po-sidebar">
+            <img className="po-mini-logo" src={logoImage} alt="PawEver logo" />
             <p className="po-sidebar-brand">PawEver</p>
             <nav aria-label="Pet owner navigation">
               {SIDEBAR_ITEMS.map((item) => (
@@ -1871,6 +1953,7 @@ export default function PetOwnerDashboard({ role, currentUser, onLogout }) {
                 <DashboardCards
                   pets={pets}
                   appointments={appointments}
+                  profile={profile}
                   onBookAppointment={() => setActivePage("Book Appointment")}
                   onAddPet={() => setActivePage("Add Pet")}
                 />

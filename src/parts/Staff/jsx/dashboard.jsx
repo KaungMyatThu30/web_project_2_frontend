@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "../css/dashboard.css";
+import logoImage from "../../../../images/Web_Logo.png";
 import {
   addDoctorAvailableSlot,
   addDoctorBlockedSlot,
@@ -1837,6 +1838,7 @@ export default function StaffDashboard({ currentUser, onLogout }) {
     <main className="st-screen">
       <section className="st-shell">
         <aside className="st-sidebar">
+          <img className="st-mini-logo" src={logoImage} alt="PawEver logo" />
           <h1>PawEver Staff</h1>
           <nav aria-label="Staff navigation">
             {STAFF_PAGES.map((page) => (

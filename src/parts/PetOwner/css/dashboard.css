@@ -1,18 +1,33 @@
+:root {
+  --po-login-bg-top: #f5eee7;
+  --po-login-bg-bottom: #cfa67a;
+  --po-login-surface: rgba(250, 243, 234, 0.94);
+  --po-login-surface-soft: #f9f1e8;
+  --po-login-surface-soft-2: #f5eadf;
+  --po-login-border: rgba(107, 74, 47, 0.28);
+  --po-login-border-soft: rgba(107, 74, 47, 0.18);
+  --po-login-text: #3b2415;
+  --po-login-text-muted: #6b4a2f;
+  --po-login-button: #8b5e34;
+  --po-login-button-hover: #744a28;
+  --po-login-highlight: rgba(214, 181, 147, 0.38);
+}
+
 .po-screen {
     min-height: 100vh;
     padding: 24px;
     box-sizing: border-box;
     background:
-      radial-gradient(circle at 8% 82%, rgba(235, 130, 65, 0.28) 0 70px, transparent 72px),
-      radial-gradient(circle at 92% 12%, rgba(229, 154, 68, 0.2) 0 54px, transparent 56px),
-      linear-gradient(180deg, #d5cdc9 0%, #d2cbc6 100%);
+      radial-gradient(circle at 8% 82%, rgba(214, 181, 147, 0.28) 0 70px, transparent 72px),
+      radial-gradient(circle at 92% 12%, rgba(107, 74, 47, 0.12) 0 54px, transparent 56px),
+      linear-gradient(180deg, var(--po-login-bg-top) 0%, var(--po-login-bg-bottom) 100%);
   }
    
   .po-stage {
     width: min(1200px, 100%);
     margin: 0 auto;
     font-family: 'Trebuchet MS', 'Gill Sans', 'Segoe UI', sans-serif;
-    color: #5b4a31;
+    color: var(--po-login-text);
   }
    
   .po-hero {
@@ -20,13 +35,13 @@
     min-height: 180px;
     border-radius: 26px;
     background:
-      radial-gradient(circle at 15% 25%, rgba(238, 150, 71, 0.85) 0 8px, transparent 9px),
-      radial-gradient(circle at 75% 12%, rgba(229, 105, 38, 0.9) 0 6px, transparent 7px),
-      linear-gradient(170deg, #f8f2e5 0%, #ece2cb 56%, #e2d8bc 100%);
+      radial-gradient(circle at 15% 25%, rgba(214, 181, 147, 0.7) 0 8px, transparent 9px),
+      radial-gradient(circle at 75% 12%, rgba(139, 94, 52, 0.55) 0 6px, transparent 7px),
+      linear-gradient(170deg, var(--po-login-surface) 0%, #f4e8d9 56%, #eddcc7 100%);
     display: grid;
     align-content: center;
     justify-items: center;
-    box-shadow: 0 20px 32px rgba(116, 88, 57, 0.2);
+    box-shadow: 0 20px 32px rgba(107, 74, 47, 0.18);
     overflow: hidden;
   }
    
@@ -35,7 +50,7 @@
     width: 12px;
     height: 12px;
     border-radius: 50%;
-    background: #f2bf58;
+    background: rgba(139, 94, 52, 0.35);
   }
    
   .po-hero-dots span:nth-child(1) {
@@ -46,13 +61,13 @@
   .po-hero-dots span:nth-child(2) {
     top: 38px;
     right: 45px;
-    background: #d9642a;
+    background: var(--po-login-button);
   }
    
   .po-hero-dots span:nth-child(3) {
     bottom: 26px;
     left: 42px;
-    background: #ec9738;
+    background: rgba(139, 94, 52, 0.5);
   }
    
   .po-hero-dots span:nth-child(4) {
@@ -72,24 +87,26 @@
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    opacity: 0.8;
+    opacity: 0.9;
+    color: var(--po-login-text-muted);
   }
    
   .po-panel {
     margin-top: 20px;
-    background: #f1eadc;
+    background: var(--po-login-surface);
     border-radius: 20px;
     padding: 18px;
     display: grid;
     gap: 18px;
-    box-shadow: 0 18px 28px rgba(109, 83, 57, 0.18);
+    border: 1px solid var(--po-login-border);
+    box-shadow: 0 18px 28px rgba(107, 74, 47, 0.14);
   }
    
   .po-sidebar {
-    background: #f7f4ef;
+    background: var(--po-login-surface-soft);
     border-radius: 18px;
     padding: 16px;
-    border: 1px solid #ece1cd;
+    border: 1px solid var(--po-login-border);
   }
    
   .po-sidebar-brand {
@@ -97,6 +114,15 @@
     font-size: 20px;
     font-weight: 800;
   }
+
+  .po-mini-logo {
+    width: 160px;
+    height: 160px;
+    object-fit: contain;
+    display: block;
+    margin: 0 0 6px;
+  }
+
    
   .po-sidebar nav {
     display: grid;
@@ -107,7 +133,7 @@
     border: 0;
     border-radius: 10px;
     background: transparent;
-    color: #706251;
+    color: var(--po-login-text-muted);
     display: flex;
     align-items: center;
     gap: 10px;
@@ -119,18 +145,19 @@
   }
    
   .po-side-link:hover {
-    background: rgba(236, 212, 168, 0.36);
+    background: var(--po-login-highlight);
   }
    
   .po-side-link.is-active {
-    background: #f1d36e;
-    color: #503e22;
+    background: rgba(139, 94, 52, 0.16);
+    color: var(--po-login-text);
+    border: 1px solid var(--po-login-border);
   }
    
   .po-side-illustration {
     margin-top: 22px;
     border-radius: 16px;
-    background: linear-gradient(170deg, #fbe39e 0%, #f4bf73 100%);
+    background: linear-gradient(170deg, #f3e3cf 0%, #e4c29d 100%);
     min-height: 140px;
     display: grid;
     place-items: center;
@@ -152,8 +179,8 @@
   .po-add-pet {
     border: 0;
     border-radius: 8px;
-    background: #6e7783;
-    color: #fff;
+    background: var(--po-login-button);
+    color: #fffaf5;
     font-size: 12px;
     font-weight: 700;
     padding: 8px 12px;
@@ -165,8 +192,9 @@
   .po-profile {
     border: 0;
     border-radius: 999px;
-    background: #fff8ea;
-    color: #5d503f;
+    background: var(--po-login-surface-soft);
+    color: var(--po-login-text);
+    border: 1px solid var(--po-login-border);
     padding: 8px 12px;
     display: inline-flex;
     align-items: center;
@@ -187,11 +215,12 @@
   .po-card {
     border-radius: 18px;
     background:
-      radial-gradient(circle at 100% 100%, rgba(233, 173, 66, 0.35) 0 90px, transparent 92px),
-      linear-gradient(180deg, #efcb62 0%, #e8bf55 100%);
-    box-shadow: 0 10px 18px rgba(130, 98, 33, 0.25);
+      radial-gradient(circle at 100% 100%, rgba(214, 181, 147, 0.28) 0 90px, transparent 92px),
+      linear-gradient(180deg, var(--po-login-surface) 0%, #f3e6d8 100%);
+    border: 1px solid var(--po-login-border);
+    box-shadow: 0 10px 18px rgba(107, 74, 47, 0.12);
     padding: 16px;
-    color: #6a552f;
+    color: var(--po-login-text);
   }
    
   .po-card h3 {
@@ -214,7 +243,7 @@
     gap: 10px;
     font-size: 12px;
     padding: 7px 0;
-    border-bottom: 1px solid rgba(107, 83, 39, 0.18);
+    border-bottom: 1px solid var(--po-login-border-soft);
   }
    
   .po-detail-list span {
@@ -228,7 +257,7 @@
   .po-appointment-id {
     margin: 4px 0 0;
     font-size: 11px;
-    color: #7a6641;
+    color: var(--po-login-text-muted);
     font-family: 'Courier New', Courier, monospace;
     word-break: break-all;
   }
@@ -243,7 +272,7 @@
     font-size: 12px;
     line-height: 1.45;
     padding: 7px 0;
-    border-bottom: 1px solid rgba(107, 83, 39, 0.18);
+    border-bottom: 1px solid var(--po-login-border-soft);
   }
    
   .po-quick-actions {
@@ -259,8 +288,8 @@
     min-width: 150px;
     border: 0;
     border-radius: 10px;
-    background: #9f7a20;
-    color: #fff;
+    background: var(--po-login-button);
+    color: #fffaf5;
     font-size: 11px;
     font-weight: 800;
     letter-spacing: 0.08em;
@@ -271,10 +300,11 @@
    
   .po-placeholder {
     border-radius: 16px;
-    background: linear-gradient(180deg, #f1d37c 0%, #e7be5a 100%);
+    background: linear-gradient(180deg, var(--po-login-surface) 0%, #f0dfcd 100%);
+    border: 1px solid var(--po-login-border);
     min-height: 320px;
     padding: 24px;
-    color: #604e2f;
+    color: var(--po-login-text);
   }
    
   .po-placeholder h2 {
@@ -357,8 +387,8 @@
   .po-mypet-actions button {
     border: 0;
     border-radius: 8px;
-    background: #7f6420;
-    color: #fff;
+    background: var(--po-login-button);
+    color: #fffaf5;
     font-size: 11px;
     font-weight: 700;
     min-height: 32px;
@@ -380,8 +410,8 @@
    
   .po-history-list li {
     border-radius: 10px;
-    background: rgba(255, 246, 219, 0.8);
-    border: 1px solid rgba(126, 94, 34, 0.18);
+    background: var(--po-login-surface-soft);
+    border: 1px solid var(--po-login-border-soft);
     padding: 10px;
     display: grid;
     gap: 6px;
@@ -429,8 +459,8 @@
     justify-self: start;
     border: 0;
     border-radius: 8px;
-    background: #7f6420;
-    color: #fff;
+    background: var(--po-login-button);
+    color: #fffaf5;
     min-height: 30px;
     padding: 0 10px;
     font-size: 11px;
@@ -439,7 +469,7 @@
   }
    
   .po-appointment-details {
-    border: 1px solid rgba(126, 94, 34, 0.22);
+    border: 1px solid var(--po-login-border);
   }
    
   .po-book-layout {
@@ -462,13 +492,13 @@
   .po-book-grid input,
   .po-book-grid select,
   .po-book-grid textarea {
-    border: 1px solid rgba(126, 94, 34, 0.26);
+    border: 1px solid var(--po-login-border);
     border-radius: 8px;
-    background: rgba(255, 248, 229, 0.85);
+    background: var(--po-login-surface-soft);
     min-height: 34px;
     padding: 0 10px;
     font: inherit;
-    color: #5b4a31;
+    color: var(--po-login-text);
   }
    
   .po-book-grid textarea {
@@ -509,8 +539,8 @@
    
   .po-medical-stat {
     border-radius: 10px;
-    border: 1px solid rgba(126, 94, 34, 0.18);
-    background: rgba(255, 246, 219, 0.8);
+    border: 1px solid var(--po-login-border-soft);
+    background: var(--po-login-surface-soft);
     padding: 10px;
   }
    
@@ -540,13 +570,13 @@
    
   .po-medical-filters input,
   .po-medical-filters select {
-    border: 1px solid rgba(126, 94, 34, 0.26);
+    border: 1px solid var(--po-login-border);
     border-radius: 8px;
-    background: rgba(255, 248, 229, 0.85);
+    background: var(--po-login-surface-soft);
     min-height: 34px;
     padding: 0 10px;
     font: inherit;
-    color: #5b4a31;
+    color: var(--po-login-text);
   }
    
   .po-medical-visit-list {
@@ -559,8 +589,8 @@
    
   .po-medical-visit-list li {
     border-radius: 10px;
-    background: rgba(255, 246, 219, 0.8);
-    border: 1px solid rgba(126, 94, 34, 0.18);
+    background: var(--po-login-surface-soft);
+    border: 1px solid var(--po-login-border-soft);
     padding: 10px;
     display: grid;
     gap: 8px;
@@ -580,8 +610,8 @@
     justify-self: start;
     border: 0;
     border-radius: 8px;
-    background: #7f6420;
-    color: #fff;
+    background: var(--po-login-button);
+    color: #fffaf5;
     min-height: 30px;
     padding: 0 10px;
     font-size: 11px;
@@ -599,8 +629,8 @@
    
   .po-record-list li {
     border-radius: 10px;
-    background: rgba(255, 246, 219, 0.8);
-    border: 1px solid rgba(126, 94, 34, 0.18);
+    background: var(--po-login-surface-soft);
+    border: 1px solid var(--po-login-border-soft);
     padding: 10px;
   }
    
@@ -621,8 +651,8 @@
     margin-top: 12px;
     border: 0;
     border-radius: 10px;
-    background: #7f6420;
-    color: #fff;
+    background: var(--po-login-button);
+    color: #fffaf5;
     font-size: 12px;
     font-weight: 800;
     letter-spacing: 0.06em;
@@ -644,10 +674,10 @@
   }
    
   .po-record-secondary {
-    border: 1px solid rgba(126, 94, 34, 0.28);
+    border: 1px solid var(--po-login-border);
     border-radius: 10px;
-    background: rgba(255, 248, 229, 0.88);
-    color: #6a552f;
+    background: var(--po-login-surface-soft);
+    color: var(--po-login-text);
     font-size: 12px;
     font-weight: 700;
     min-height: 36px;
@@ -672,8 +702,8 @@
     border-radius: 50%;
     display: grid;
     place-items: center;
-    background: #8d6d1d;
-    color: #fff;
+    background: var(--po-login-button);
+    color: #fffaf5;
     font-size: 22px;
     font-weight: 800;
     overflow: hidden;
@@ -698,8 +728,8 @@
   .po-profile-badge {
     width: fit-content;
     border-radius: 999px;
-    background: rgba(127, 100, 32, 0.18);
-    color: #6a552f;
+    background: rgba(139, 94, 52, 0.14);
+    color: var(--po-login-text);
     padding: 6px 10px;
     font-size: 11px;
     font-weight: 800;
@@ -716,26 +746,26 @@
     gap: 6px;
     font-size: 12px;
     font-weight: 700;
-    color: #6a552f;
+    color: var(--po-login-text);
   }
    
   .po-profile-form input,
   .po-profile-form select {
-    border: 1px solid rgba(126, 94, 34, 0.26);
+    border: 1px solid var(--po-login-border);
     border-radius: 8px;
-    background: rgba(255, 248, 229, 0.85);
+    background: var(--po-login-surface-soft);
     min-height: 34px;
     padding: 0 10px;
     font: inherit;
-    color: #5b4a31;
+    color: var(--po-login-text);
   }
    
   .po-profile-save {
     margin-top: 12px;
     border: 0;
     border-radius: 10px;
-    background: #7f6420;
-    color: #fff;
+    background: var(--po-login-button);
+    color: #fffaf5;
     font-size: 12px;
     font-weight: 800;
     letter-spacing: 0.04em;
@@ -760,7 +790,7 @@
   }
    
   .po-pref-list input {
-    accent-color: #8d6d1d;
+    accent-color: var(--po-login-button);
   }
    
   .po-security-actions {
@@ -772,8 +802,8 @@
   .po-security-actions button {
     border: 0;
     border-radius: 8px;
-    background: #7f6420;
-    color: #fff;
+    background: var(--po-login-button);
+    color: #fffaf5;
     min-height: 34px;
     padding: 0 10px;
     text-align: left;
@@ -792,8 +822,8 @@
    
   .po-profile-list li {
     border-radius: 10px;
-    background: rgba(255, 246, 219, 0.8);
-    border: 1px solid rgba(126, 94, 34, 0.18);
+    background: var(--po-login-surface-soft);
+    border: 1px solid var(--po-login-border-soft);
     padding: 10px;
     display: grid;
     gap: 8px;
@@ -816,13 +846,43 @@
     justify-self: start;
     border: 0;
     border-radius: 8px;
-    background: #7f6420;
-    color: #fff;
+    background: var(--po-login-button);
+    color: #fffaf5;
     min-height: 30px;
     padding: 0 10px;
     font-size: 11px;
     font-weight: 700;
     cursor: pointer;
+  }
+
+  .po-add-pet:hover,
+  .po-quick-actions button:hover,
+  .po-mypets-add-btn:hover,
+  .po-mypet-actions button:hover,
+  .po-history-list button:hover,
+  .po-medical-visit-list button:hover,
+  .po-record-download:hover,
+  .po-profile-save:hover,
+  .po-security-actions button:hover,
+  .po-profile-list button:hover {
+    background: var(--po-login-button-hover);
+  }
+
+  .po-book-grid input:focus-visible,
+  .po-book-grid select:focus-visible,
+  .po-book-grid textarea:focus-visible,
+  .po-medical-filters input:focus-visible,
+  .po-medical-filters select:focus-visible,
+  .po-profile-form input:focus-visible,
+  .po-profile-form select:focus-visible,
+  .po-side-link:focus-visible,
+  .po-add-pet:focus-visible,
+  .po-profile:focus-visible,
+  .po-mypets-add-btn:focus-visible,
+  .po-record-download:focus-visible,
+  .po-record-secondary:focus-visible {
+    outline: 3px solid var(--po-login-button);
+    outline-offset: 2px;
   }
    
   @media (min-width: 860px) {

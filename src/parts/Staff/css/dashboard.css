@@ -7,6 +7,135 @@
     radial-gradient(circle at 94% 88%, rgba(92, 148, 164, 0.22) 0 140px, transparent 142px), 
     linear-gradient(180deg, #e8efeb 0%, #dde5e2 100%); 
     } 
+
+/* Login-page palette override for Staff dashboard */
+.st-screen {
+  background:
+    radial-gradient(circle at 8% 12%, rgba(214, 181, 147, 0.24) 0 120px, transparent 122px),
+    radial-gradient(circle at 94% 88%, rgba(107, 74, 47, 0.14) 0 140px, transparent 142px),
+    linear-gradient(180deg, #f5eee7 0%, #cfa67a 100%) !important;
+}
+
+.st-shell,
+.st-main,
+.st-sidebar,
+.st-modal {
+  color: #3b2415 !important;
+  border-color: rgba(107, 74, 47, 0.28) !important;
+}
+
+.st-shell,
+.st-main,
+.st-modal {
+  background: rgba(250, 243, 234, 0.95) !important;
+  box-shadow: 0 20px 32px rgba(107, 74, 47, 0.14) !important;
+}
+
+.st-sidebar {
+  background: #f9f1e8 !important;
+}
+
+.st-nav-btn {
+  color: #6b4a2f !important;
+}
+
+.st-nav-btn:hover {
+  background: rgba(214, 181, 147, 0.32) !important;
+}
+
+.st-nav-btn.is-active {
+  background: rgba(139, 94, 52, 0.14) !important;
+  color: #3b2415 !important;
+  border: 1px solid rgba(107, 74, 47, 0.28);
+}
+
+.st-header p,
+.st-card p,
+.st-dashboard-metric span,
+.st-action-card span,
+.st-appointment-id {
+  color: #6b4a2f !important;
+}
+
+.st-card,
+.st-dashboard-metric,
+.st-action-card,
+.st-dashboard-list li,
+.st-appointment-list li,
+.st-history-list li,
+.st-owner-list li,
+.st-pet-record-item,
+.st-reports-kpis > *,
+.st-report-trend-list li {
+  background: #f9f1e8 !important;
+  border-color: rgba(107, 74, 47, 0.18) !important;
+  color: #3b2415 !important;
+  box-shadow: none !important;
+}
+
+.st-card {
+  background:
+    radial-gradient(circle at 100% 100%, rgba(214, 181, 147, 0.2) 0 80px, transparent 82px),
+    linear-gradient(180deg, rgba(250, 243, 234, 0.95) 0%, #f5eadf 100%) !important;
+  border-color: rgba(107, 74, 47, 0.28) !important;
+}
+
+.st-metric-value,
+.st-dashboard-metric strong,
+.st-action-card strong {
+  color: #8b5e34 !important;
+}
+
+.st-logout,
+.st-billing-actions button,
+.st-appointment-actions button,
+.st-plain-btn,
+.st-dashboard-list li button,
+.st-action-card button {
+  background: #8b5e34 !important;
+  color: #fffaf5 !important;
+  border: 0 !important;
+}
+
+.st-logout:hover,
+.st-billing-actions button:hover,
+.st-appointment-actions button:hover,
+.st-plain-btn:hover,
+.st-dashboard-list li button:hover {
+  background: #744a28 !important;
+}
+
+.st-danger-btn {
+  background: #8b3131 !important;
+}
+
+.st-filters input,
+.st-filters select,
+.st-profile-form input,
+.st-profile-form select,
+.st-profile-form textarea,
+.st-charge-grid input,
+.st-charge-grid select,
+.st-card input,
+.st-card select,
+.st-card textarea {
+  background: #f9f1e8 !important;
+  border: 1px solid rgba(107, 74, 47, 0.28) !important;
+  color: #3b2415 !important;
+}
+
+.st-filters input:focus-visible,
+.st-filters select:focus-visible,
+.st-profile-form input:focus-visible,
+.st-profile-form select:focus-visible,
+.st-profile-form textarea:focus-visible,
+.st-nav-btn:focus-visible,
+.st-logout:focus-visible,
+.st-billing-actions button:focus-visible,
+.st-appointment-actions button:focus-visible {
+  outline: 3px solid #8b5e34 !important;
+  outline-offset: 2px;
+}
      
     .st-shell { 
     width: min(1200px, 100%); 
@@ -36,6 +165,15 @@
     margin: 0; 
     font-size: 20px; 
     } 
+
+    .st-mini-logo {
+    width: 160px;
+    height: 160px;
+    object-fit: contain;
+    display: block;
+    margin: 0 0 6px;
+    }
+
      
     .st-sidebar nav { 
     display: grid; 

@@ -16,6 +16,134 @@
   box-sizing: border-box;
 }
 
+/* Login-page palette override for Doctor dashboard */
+.dr-screen {
+  background:
+    radial-gradient(circle at 10% 15%, rgba(214, 181, 147, 0.22) 0 110px, transparent 112px),
+    radial-gradient(circle at 95% 90%, rgba(107, 74, 47, 0.13) 0 140px, transparent 142px),
+    linear-gradient(180deg, #f5eee7 0%, #cfa67a 100%) !important;
+}
+
+.dr-shell,
+.dr-sidebar,
+.dr-main {
+  color: #3b2415 !important;
+  border-color: rgba(107, 74, 47, 0.28) !important;
+}
+
+.dr-shell,
+.dr-main {
+  background: rgba(250, 243, 234, 0.95) !important;
+  box-shadow: 0 20px 32px rgba(107, 74, 47, 0.14) !important;
+}
+
+.dr-sidebar {
+  background: #f9f1e8 !important;
+}
+
+.dr-nav-btn {
+  color: #6b4a2f !important;
+}
+
+.dr-nav-btn:hover {
+  background: rgba(214, 181, 147, 0.32) !important;
+}
+
+.dr-nav-btn.is-active {
+  background: rgba(139, 94, 52, 0.14) !important;
+  color: #3b2415 !important;
+  border: 1px solid rgba(107, 74, 47, 0.28);
+}
+
+.dr-header p,
+.dr-card p,
+.dr-appointment-id,
+.dr-list span {
+  color: #6b4a2f !important;
+}
+
+.dr-card,
+.dr-list li,
+.dr-appointment-list li,
+.dr-consult-list li,
+.dr-prescription-list li,
+.dr-schedule-list li,
+.dr-record-entry,
+.dr-record-metrics > *,
+.dr-info-grid > * {
+  background: #f9f1e8 !important;
+  border-color: rgba(107, 74, 47, 0.18) !important;
+  color: #3b2415 !important;
+  box-shadow: none !important;
+}
+
+.dr-card {
+  background:
+    radial-gradient(circle at 100% 100%, rgba(214, 181, 147, 0.2) 0 80px, transparent 82px),
+    linear-gradient(180deg, rgba(250, 243, 234, 0.95) 0%, #f5eadf 100%) !important;
+  border-color: rgba(107, 74, 47, 0.28) !important;
+}
+
+.dr-count {
+  color: #8b5e34 !important;
+}
+
+.dr-logout,
+.dr-quick-actions button,
+.dr-card button,
+.dr-tab-btn.is-active,
+.dr-appointment-list button,
+.dr-consult-list button,
+.dr-prescription-list button,
+.dr-schedule button {
+  background: #8b5e34 !important;
+  color: #fffaf5 !important;
+  border: 0 !important;
+}
+
+.dr-logout:hover,
+.dr-quick-actions button:hover,
+.dr-card button:hover,
+.dr-appointment-list button:hover,
+.dr-consult-list button:hover,
+.dr-prescription-list button:hover,
+.dr-schedule button:hover {
+  background: #744a28 !important;
+}
+
+.dr-tab-btn {
+  background: #f9f1e8 !important;
+  color: #3b2415 !important;
+  border: 1px solid rgba(107, 74, 47, 0.28) !important;
+}
+
+.dr-filters input,
+.dr-filters select,
+.dr-entry-fields input,
+.dr-entry-fields select,
+.dr-entry-fields textarea,
+.dr-profile-grid input,
+.dr-profile-grid select,
+.dr-profile-grid textarea,
+.dr-card input,
+.dr-card select,
+.dr-card textarea {
+  background: #f9f1e8 !important;
+  border: 1px solid rgba(107, 74, 47, 0.28) !important;
+  color: #3b2415 !important;
+}
+
+.dr-filters input:focus-visible,
+.dr-filters select:focus-visible,
+.dr-entry-fields input:focus-visible,
+.dr-entry-fields select:focus-visible,
+.dr-entry-fields textarea:focus-visible,
+.dr-nav-btn:focus-visible,
+.dr-card button:focus-visible {
+  outline: 3px solid #8b5e34 !important;
+  outline-offset: 2px;
+}
+
 .dr-shell {
   width: min(1200px, 100%);
   margin: 0 auto;
@@ -44,6 +172,15 @@
   margin: 0;
   font-size: 20px;
 }
+
+.dr-mini-logo {
+  width: 160px;
+  height: 160px;
+  object-fit: contain;
+  display: block;
+  margin: 0 0 6px;
+}
+
 
 .dr-sidebar nav {
   display: grid;
