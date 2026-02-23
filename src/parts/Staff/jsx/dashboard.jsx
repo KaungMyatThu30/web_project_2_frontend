@@ -435,7 +435,6 @@ export default function StaffDashboard({ currentUser, onLogout }) {
     { title: "Collected", value: formatBaht(totalCollected) },
     { title: "Pending", value: formatBaht(totalPending) },
   ];
-
   useEffect(() => {
     let cancelled = false;
 
@@ -914,7 +913,12 @@ export default function StaffDashboard({ currentUser, onLogout }) {
     try {
       setAppointmentError("");
       setAppointmentStatusMessage("");
-      const response = await updateAppointmentById(appointmentId, updates);
+      const response = await updateAppointmentById(appointmentId, {
+        ...updates,
+        auditActorId: String(profile?.id || currentUser?.id || "").trim(),
+        auditActorName: String(profile?.name || currentUser?.name || "").trim(),
+        auditActorRole: "staff",
+      });
       const updated = response?.appointment;
       if (updated) {
         setAppointments((currentItems) =>
@@ -1225,7 +1229,12 @@ export default function StaffDashboard({ currentUser, onLogout }) {
     try {
       setPetRecordError("");
       setPetRecordStatusMessage("");
-      const response = await updatePetById(petEditModalPet.id, payload);
+      const response = await updatePetById(petEditModalPet.id, {
+        ...payload,
+        auditActorId: String(profile?.id || currentUser?.id || "").trim(),
+        auditActorName: String(profile?.name || currentUser?.name || "").trim(),
+        auditActorRole: "staff",
+      });
       const updated = response?.pet;
       if (updated) {
         setPets((current) =>

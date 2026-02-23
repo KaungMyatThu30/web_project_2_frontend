@@ -1691,6 +1691,9 @@ export default function PetOwnerDashboard({ role, currentUser, onLogout }) {
   const handleUpdatePet = async (petId, updates) => {
     const response = await updatePetById(petId, updates, {
       userId: currentUser?.id || "",
+      auditActorId: currentUser?.id || "",
+      auditActorName: currentUser?.name || "",
+      auditActorRole: "pet-owner",
     });
     const updatedPet = response?.pet;
     if (updatedPet) {

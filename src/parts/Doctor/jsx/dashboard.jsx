@@ -614,6 +614,9 @@ export default function DoctorDashboard({ currentUser, onLogout }) {
       await createConsultation(consultationPayload);
       const response = await updateAppointmentById(selectedConsultation.id, {
         status: mappedStatus,
+        auditActorId: String(profile?.id || currentUser?.id || "").trim(),
+        auditActorName: String(profile?.name || currentUser?.name || "").trim(),
+        auditActorRole: "doctor",
       });
       const updated = response?.appointment;
       if (updated) {
@@ -750,6 +753,9 @@ export default function DoctorDashboard({ currentUser, onLogout }) {
       labResult: String(formData.get("labResult") || "").trim(),
       notes: String(formData.get("notes") || "").trim(),
       recordDate: String(formData.get("recordDate") || "").trim(),
+      auditActorId: String(profile?.id || currentUser?.id || "").trim(),
+      auditActorName: String(profile?.name || currentUser?.name || "").trim(),
+      auditActorRole: "doctor",
     };
 
     try {
