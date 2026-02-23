@@ -475,6 +475,26 @@ function MyPetsPage({
 }
 
 function AddPetPage({ onBackToPets, onSavePet }) {
+  const PET_BREED_OPTIONS = [
+    "Golden Retriever",
+    "Labrador Retriever",
+    "German Shepherd",
+    "Poodle",
+    "Bulldog",
+    "Beagle",
+    "Rottweiler",
+    "Siberian Husky",
+    "Pomeranian",
+    "Shih Tzu",
+    "Persian",
+    "Siamese",
+    "Maine Coon",
+    "British Shorthair",
+    "Bengal",
+    "Mixed Breed",
+    "Other",
+  ];
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -536,12 +556,16 @@ function AddPetPage({ onBackToPets, onSavePet }) {
           </label>
           <label>
             Breed
-            <input
-              name="breed"
-              type="text"
-              placeholder="Enter breed"
-              required
-            />
+            <select name="breed" defaultValue="" required>
+              <option value="" disabled>
+                Select breed
+              </option>
+              {PET_BREED_OPTIONS.map((breed) => (
+                <option key={breed} value={breed}>
+                  {breed}
+                </option>
+              ))}
+            </select>
           </label>
           <label>
             Age
