@@ -3,7 +3,7 @@ import '../css/login.css'
 import logoImage from '../../../../images/Web_Logo.png'
 import { loginUser } from '../../../lib/api'
  
-export default function Login({ onBack, onContinue }) {
+export default function Login({ onBack, onContinue, onForgotPassword }) {
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
  
@@ -31,7 +31,7 @@ export default function Login({ onBack, onContinue }) {
       setIsSubmitting(false)
     }
   }
- 
+
   return (
     <main className="login-form-screen">
       <section className="login-form-card">
@@ -89,7 +89,11 @@ export default function Login({ onBack, onContinue }) {
               <input type="checkbox" />
               <span>Remember me</span>
             </label>
-            <button className="forgot-link-btn" type="button">
+            <button
+              className="forgot-link-btn"
+              type="button"
+              onClick={onForgotPassword}
+            >
               Forgot password?
             </button>
           </div>
@@ -100,7 +104,7 @@ export default function Login({ onBack, onContinue }) {
           {error ? <p className="form-status-error">{error}</p> : null}
           <p className="login-form-note">Secure login protected with encrypted sessions.</p>
         </form>
- 
+
         <button className="login-back-btn" type="button" onClick={onBack}>
           Back to options
         </button>

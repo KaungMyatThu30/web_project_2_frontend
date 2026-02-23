@@ -51,6 +51,20 @@ export function loginUser(body) {
   });
 }
 
+export function requestPasswordReset(body) {
+  return request("/api/auth/forgot-password", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+export function resetPasswordWithToken(body) {
+  return request("/api/auth/reset-password", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
 export function createAppointment(body) {
   return request("/api/appointments", {
     method: "POST",

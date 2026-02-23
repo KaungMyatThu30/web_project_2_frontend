@@ -1,6 +1,7 @@
 import "./App.css";
 import { useState } from "react";
 import Login from "./parts/Login/jsx/login";
+import ForgotPassword from "./parts/Login/jsx/forgotPassword";
 import LoginOption from "./components/Login/loginoption";
 import Register from "./parts/Login/jsx/register";
 import PetOwnerDashboard from "./parts/PetOwner/jsx/dashboard";
@@ -27,6 +28,7 @@ export default function App() {
     currentPage = (
       <Login
         onBack={() => goToScreen("options")}
+        onForgotPassword={() => goToScreen("forgot-password")}
         onContinue={(user) => {
           const nextRole = user?.role || "pet-owner";
           setCurrentUser(user || null);
@@ -42,6 +44,12 @@ export default function App() {
           );
         }}
       />
+    );
+  }
+
+  if (screen === "forgot-password") {
+    currentPage = (
+      <ForgotPassword onBackToLogin={() => goToScreen("login")} />
     );
   }
 

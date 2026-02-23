@@ -1822,7 +1822,6 @@ export default function PetOwnerDashboard({ role, currentUser, onLogout }) {
             <span />
             <span />
           </div>
-          <p className="po-hero-title">🐶 🐕 🐾 🐩 🐕‍🦺 🐶</p>
           <p className="po-hero-subtitle">Pet Owner Dashboard</p>
         </header>
 
@@ -1844,9 +1843,6 @@ export default function PetOwnerDashboard({ role, currentUser, onLogout }) {
                 </button>
               ))}
             </nav>
-            <div className="po-side-illustration" aria-hidden="true">
-              <span>🐈</span>
-            </div>
           </aside>
 
           <div className="po-main">
