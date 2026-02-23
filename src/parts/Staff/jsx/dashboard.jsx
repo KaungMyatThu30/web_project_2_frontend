@@ -2020,6 +2020,17 @@ export default function StaffDashboard({ currentUser, onLogout }) {
                           type="button"
                           onClick={() =>
                             handleAppointmentUpdate(item.id, {
+                              status: "Completed",
+                            })
+                          }
+                          disabled={item.status !== "Confirmed"}
+                        >
+                          Complete
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleAppointmentUpdate(item.id, {
                               status: "Cancelled",
                             })
                           }
