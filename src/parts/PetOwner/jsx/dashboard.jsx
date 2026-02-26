@@ -9,6 +9,7 @@ import {
   deletePetById,
   getUserProfile,
   listAppointments,
+  listMedicalRecords,
   listPets,
   listUsers,
   updatePetById,
@@ -66,9 +67,165 @@ function formatNotificationChannels(preferredContact, includeEmailEligible = tru
   return channels.join(" / ");
 }
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+const VACCINATION_DUE_SOON_DAYS = 30;
+const VACCINE_INTERVAL_RULES = [
+  { keywords: ["rabies"], days: 365 },
+  { keywords: ["dhpp", "distemper", "parvo", "adenovirus"], days: 365 },
+  { keywords: ["bordetella"], days: 180 },
+  { keywords: ["leptospirosis", "lepto"], days: 365 },
+  { keywords: ["influenza", "flu"], days: 365 },
+  { keywords: ["fvrcp"], days: 365 },
+  { keywords: ["fe lv", "felv"], days: 365 },
+];
+
+function parseDateValue(value) {
+  if (!value) {
+    return null;
+  }
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function startOfDay(date) {
+  const copy = new Date(date);
+  copy.setHours(0, 0, 0, 0);
+  return copy;
+}
+
+function addDays(date, days) {
+  return new Date(date.getTime() + days * DAY_MS);
+}
+
+function getDaysUntil(date, fromDate = new Date()) {
+  const diff = startOfDay(date).getTime() - startOfDay(fromDate).getTime();
+  return Math.round(diff / DAY_MS);
+}
+
+function getVaccineIntervalDays(vaccineName) {
+  const normalized = String(vaccineName || "").trim().toLowerCase();
+  if (!normalized) {
+    return 365;
+  }
+  const matchedRule = VACCINE_INTERVAL_RULES.find((rule) =>
+    rule.keywords.some((keyword) => normalized.includes(keyword))
+  );
+  return matchedRule?.days || 365;
+}
+
+function getVaccinationSchedules(pets, medicalRecords) {
+  const now = new Date();
+  const petIds = new Set(pets.map((pet) => String(pet.id || "")));
+  const vaccinationRecords = medicalRecords
+    .filter((record) => String(record.vaccine || "").trim())
+    .filter((record) => {
+      const petId = String(record.petId || "");
+      if (petId && petIds.size) {
+        return petIds.has(petId);
+      }
+      return pets.some((pet) => pet.name === record.petName);
+    });
+
+  return pets.map((pet) => {
+    const history = vaccinationRecords
+      .filter(
+        (record) =>
+          String(record.petId || "") === String(pet.id || "") ||
+          (!record.petId && record.petName === pet.name)
+      )
+      .map((record) => {
+        const eventDate =
+          parseDateValue(record.recordDate) ||
+          parseDateValue(record.createdAt) ||
+          parseDateValue(record.updatedAt);
+        return {
+          id: record.id,
+          petId: record.petId,
+          petName: record.petName,
+          vaccine: record.vaccine,
+          doctorName: record.doctorName,
+          notes: record.notes || "",
+          recordDate: record.recordDate || "",
+          eventDate,
+          createdAt: record.createdAt,
+        };
+      })
+      .sort((a, b) => {
+        const aTs = a.eventDate?.getTime() || 0;
+        const bTs = b.eventDate?.getTime() || 0;
+        return bTs - aTs;
+      });
+
+    const latestRecord = history[0] || null;
+    const normalizedManualStatus = String(pet.vaccinationStatus || "")
+      .trim()
+      .toLowerCase();
+
+    if (!latestRecord || !latestRecord.eventDate) {
+      let reminderStatus = "unknown";
+      if (normalizedManualStatus === "pending") {
+        reminderStatus = "overdue";
+      } else if (normalizedManualStatus.includes("due soon")) {
+        reminderStatus = "due-soon";
+      } else if (normalizedManualStatus === "up to date") {
+        reminderStatus = "up-to-date";
+      }
+      return {
+        petId: pet.id,
+        petName: pet.name,
+        manualStatus: pet.vaccinationStatus,
+        latestRecord: null,
+        history,
+        nextDueDate: null,
+        nextDueDateLabel: "No vaccine date recorded",
+        reminderStatus,
+        reminderStatusLabel:
+          reminderStatus === "overdue"
+            ? "Overdue"
+            : reminderStatus === "due-soon"
+            ? "Due soon"
+            : reminderStatus === "up-to-date"
+            ? "Up to date"
+            : "No history",
+        daysUntilDue: null,
+      };
+    }
+
+    const intervalDays = getVaccineIntervalDays(latestRecord.vaccine);
+    const nextDueDate = addDays(latestRecord.eventDate, intervalDays);
+    const daysUntilDue = getDaysUntil(nextDueDate, now);
+    let reminderStatus = "up-to-date";
+    if (daysUntilDue < 0) {
+      reminderStatus = "overdue";
+    } else if (daysUntilDue <= VACCINATION_DUE_SOON_DAYS) {
+      reminderStatus = "due-soon";
+    }
+
+    return {
+      petId: pet.id,
+      petName: pet.name,
+      manualStatus: pet.vaccinationStatus,
+      latestRecord,
+      history,
+      nextDueDate,
+      nextDueDateLabel: formatAppointmentDate(nextDueDate.toISOString()),
+      reminderStatus,
+      reminderStatusLabel:
+        reminderStatus === "overdue"
+          ? "Overdue"
+          : reminderStatus === "due-soon"
+          ? "Due soon"
+          : "Up to date",
+      daysUntilDue,
+      intervalDays,
+    };
+  });
+}
+
 function DashboardCards({
   pets,
   appointments,
+  medicalRecords,
   profile,
   onBookAppointment,
   onAddPet,
@@ -100,8 +257,9 @@ function DashboardCards({
     )[0] || null;
   const recentAppointment =
     getSortedAppointments(appointments, "desc")[0] || null;
-  const vaccineReminders = pets.filter(
-    (pet) => String(pet.vaccinationStatus || "").toLowerCase() !== "up to date"
+  const vaccinationSchedules = getVaccinationSchedules(pets, medicalRecords);
+  const vaccineReminders = vaccinationSchedules.filter(
+    (item) => item.reminderStatus === "due-soon" || item.reminderStatus === "overdue"
   );
   const appointmentStatusNotifications = getSortedAppointments(
     appointments.filter((item) => {
@@ -169,9 +327,16 @@ function DashboardCards({
         <h3>Pet Vaccination Reminders</h3>
         {vaccineReminders.length ? (
           <ul className="po-note-list">
-            {vaccineReminders.map((pet) => (
-              <li key={pet.id}>
-                {pet.name}: Vaccination status is {pet.vaccinationStatus}.
+            {vaccineReminders.map((entry) => (
+              <li key={entry.petId}>
+                {entry.petName}: {entry.reminderStatusLabel}
+                {entry.nextDueDate
+                  ? ` (next due ${entry.nextDueDateLabel})`
+                  : ` (${entry.nextDueDateLabel})`}
+                {entry.latestRecord?.vaccine
+                  ? ` - last vaccine: ${entry.latestRecord.vaccine}`
+                  : ""}
+                .
               </li>
             ))}
           </ul>
@@ -233,10 +398,11 @@ function DashboardCards({
           ))}
 
           {vaccinationReminderEnabled
-            ? vaccineReminders.slice(0, 3).map((pet) => (
-                <li key={`vax-${pet.id}`}>
-                  Vaccination reminder: {pet.name} is marked{" "}
-                  {pet.vaccinationStatus}. ({reminderChannels})
+            ? vaccineReminders.slice(0, 3).map((entry) => (
+                <li key={`vax-${entry.petId}`}>
+                  Vaccination reminder: {entry.petName} is {entry.reminderStatusLabel}
+                  {entry.nextDueDate ? ` (next due ${entry.nextDueDateLabel})` : ""}. (
+                  {reminderChannels})
                 </li>
               ))
             : null}
@@ -1009,7 +1175,7 @@ function BookAppointmentPage({
   );
 }
 
-function MedicalRecordsPage({ pets, appointments }) {
+function MedicalRecordsPage({ pets, appointments, medicalRecords }) {
   const [petFilter, setPetFilter] = useState("All Pets");
   const [recordTypeFilter, setRecordTypeFilter] = useState("All Types");
   const [searchTerm, setSearchTerm] = useState("");
@@ -1060,7 +1226,38 @@ function MedicalRecordsPage({ pets, appointments }) {
 
   const selectedRecord =
     filteredRecords.find((item) => item.id === selectedRecordId) || null;
-  const latestRecord = appointments[0] || null;
+  const vaccinationSchedules = getVaccinationSchedules(pets, medicalRecords);
+  const vaccineTimelineEntries = medicalRecords
+    .filter((record) => String(record.vaccine || "").trim())
+    .filter((record) => {
+      if (petFilter === "All Pets") {
+        return true;
+      }
+      return record.petName === petFilter;
+    })
+    .map((record) => {
+      const eventDate =
+        parseDateValue(record.recordDate) ||
+        parseDateValue(record.createdAt) ||
+        parseDateValue(record.updatedAt);
+      return {
+        ...record,
+        eventDate,
+      };
+    })
+    .sort((a, b) => (b.eventDate?.getTime() || 0) - (a.eventDate?.getTime() || 0));
+  const latestMedicalRecord = [...medicalRecords]
+    .map((record) => ({
+      ...record,
+      eventDate:
+        parseDateValue(record.recordDate) ||
+        parseDateValue(record.createdAt) ||
+        parseDateValue(record.updatedAt),
+    }))
+    .sort((a, b) => (b.eventDate?.getTime() || 0) - (a.eventDate?.getTime() || 0))[0];
+  const nextVaccineDue = [...vaccinationSchedules]
+    .filter((item) => item.nextDueDate)
+    .sort((a, b) => (a.nextDueDate?.getTime() || 0) - (b.nextDueDate?.getTime() || 0))[0];
 
   useEffect(() => {
     setSelectedRecordId((currentId) => {
@@ -1073,10 +1270,6 @@ function MedicalRecordsPage({ pets, appointments }) {
       return filteredRecords[0].id;
     });
   }, [filteredRecords]);
-  const pendingVaccine = pets.find(
-    (pet) => String(pet.vaccinationStatus || "").toLowerCase() !== "up to date"
-  );
-
   const buildRecordLines = (record) => [
     "Pet Medical Record",
     "",
@@ -1177,14 +1370,14 @@ function MedicalRecordsPage({ pets, appointments }) {
         <article className="po-card po-medical-summary">
           <div className="po-medical-stat">
             <p>Total Records</p>
-            <strong>{appointments.length}</strong>
+            <strong>{medicalRecords.length || appointments.length}</strong>
           </div>
           <div className="po-medical-stat">
             <p>Last Updated</p>
             <strong>
-              {latestRecord
+              {latestMedicalRecord
                 ? formatAppointmentDate(
-                    latestRecord.appointmentDate || latestRecord.date
+                    latestMedicalRecord.recordDate || latestMedicalRecord.createdAt
                   )
                 : "-"}
             </strong>
@@ -1192,9 +1385,11 @@ function MedicalRecordsPage({ pets, appointments }) {
           <div className="po-medical-stat">
             <p>Upcoming Vaccine</p>
             <strong>
-              {pendingVaccine
-                ? `${pendingVaccine.name} (${pendingVaccine.vaccinationStatus})`
-                : "No pending reminder"}
+              {nextVaccineDue
+                ? `${nextVaccineDue.petName} (${nextVaccineDue.reminderStatusLabel}${
+                    nextVaccineDue.nextDueDate ? `: ${nextVaccineDue.nextDueDateLabel}` : ""
+                  })`
+                : "No vaccine schedule data"}
             </strong>
           </div>
         </article>
@@ -1239,6 +1434,26 @@ function MedicalRecordsPage({ pets, appointments }) {
               />
             </label>
           </div>
+        </article>
+
+        <article className="po-card">
+          <h3>Vaccine History Timeline</h3>
+          {!vaccineTimelineEntries.length ? (
+            <p className="po-mypets-subtitle">
+              No vaccination entries found in medical records yet.
+            </p>
+          ) : (
+            <ul className="po-note-list">
+              {vaccineTimelineEntries.slice(0, 12).map((record) => (
+                <li key={`vax-timeline-${record.id}`}>
+                  {formatAppointmentDate(record.recordDate || record.createdAt)}:{" "}
+                  <strong>{record.petName}</strong> received{" "}
+                  <strong>{record.vaccine}</strong>
+                  {record.doctorName ? ` (Dr. ${record.doctorName})` : ""}.
+                </li>
+              ))}
+            </ul>
+          )}
         </article>
 
         <article className="po-card">
@@ -1610,6 +1825,7 @@ export default function PetOwnerDashboard({ role, currentUser, onLogout }) {
   const [activePage, setActivePage] = useState("Dashboard");
   const [pets, setPets] = useState([]);
   const [appointments, setAppointments] = useState([]);
+  const [medicalRecords, setMedicalRecords] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [profile, setProfile] = useState(currentUser || null);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
@@ -1701,6 +1917,65 @@ export default function PetOwnerDashboard({ role, currentUser, onLogout }) {
       cancelled = true;
     };
   }, [currentUser?.id, currentUser?.name, profile?.name]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadMedicalRecordsForOwnedPets = async () => {
+      if (!currentUser?.id) {
+        if (!cancelled) {
+          setMedicalRecords([]);
+        }
+        return;
+      }
+
+      if (!pets.length) {
+        if (!cancelled) {
+          setMedicalRecords([]);
+        }
+        return;
+      }
+
+      try {
+        const response = await listMedicalRecords();
+        const records = Array.isArray(response?.records) ? response.records : [];
+        const petIdSet = new Set(pets.map((pet) => String(pet.id || "")));
+        const petNameSet = new Set(pets.map((pet) => String(pet.name || "")));
+        const ownerNameLower = String(profile?.name || currentUser?.name || "")
+          .trim()
+          .toLowerCase();
+        const filtered = records.filter((record) => {
+          const recordPetId = String(record.petId || "");
+          const recordPetName = String(record.petName || "");
+          const recordOwnerName = String(record.ownerName || "")
+            .trim()
+            .toLowerCase();
+          if (recordPetId && petIdSet.has(recordPetId)) {
+            return true;
+          }
+          if (recordPetName && petNameSet.has(recordPetName)) {
+            if (!ownerNameLower) {
+              return true;
+            }
+            return !recordOwnerName || recordOwnerName === ownerNameLower;
+          }
+          return false;
+        });
+        if (!cancelled) {
+          setMedicalRecords(filtered);
+        }
+      } catch (_error) {
+        if (!cancelled) {
+          setMedicalRecords([]);
+        }
+      }
+    };
+
+    loadMedicalRecordsForOwnedPets();
+    return () => {
+      cancelled = true;
+    };
+  }, [currentUser?.id, currentUser?.name, profile?.name, pets]);
 
   useEffect(() => {
     let cancelled = false;
@@ -1953,6 +2228,7 @@ export default function PetOwnerDashboard({ role, currentUser, onLogout }) {
                 <DashboardCards
                   pets={pets}
                   appointments={appointments}
+                  medicalRecords={medicalRecords}
                   profile={profile}
                   onBookAppointment={() => setActivePage("Book Appointment")}
                   onAddPet={() => setActivePage("Add Pet")}
@@ -1986,7 +2262,11 @@ export default function PetOwnerDashboard({ role, currentUser, onLogout }) {
                   onDeleteAppointment={handleDeleteAppointment}
                 />
               ) : activePage === "Medical Records" ? (
-                <MedicalRecordsPage pets={pets} appointments={appointments} />
+                <MedicalRecordsPage
+                  pets={pets}
+                  appointments={appointments}
+                  medicalRecords={medicalRecords}
+                />
               ) : activePage === "Profile" ? (
                 <ProfilePage
                   profile={profile}
