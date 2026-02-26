@@ -397,18 +397,16 @@ export default function StaffDashboard({ currentUser, onLogout }) {
   const selectedBillingRecord =
     billingRecords.find((item) => item.id === selectedBillingId) || null;
   const totalCollected = billingRecords
-    .filter((item) => item.paymentStatus === "Paid")
-    .reduce((sum, item) => sum + Number(item.totalAmount || 0), 0);
+    .reduce((sum, item) => sum + Number(item.amountPaid || 0), 0);
   const totalPending = billingRecords
-    .filter((item) => item.paymentStatus === "Pending")
-    .reduce((sum, item) => sum + Number(item.totalAmount || 0), 0);
+    .reduce((sum, item) => sum + Number(item.balanceDue || 0), 0);
   const todayCollected = billingRecords
     .filter(
       (item) =>
-        item.paymentStatus === "Paid" &&
+        Number(item.amountPaid || 0) > 0 &&
         normalizeIsoDate(item.paymentDate) === todayDashboardDate
     )
-    .reduce((sum, item) => sum + Number(item.totalAmount || 0), 0);
+    .reduce((sum, item) => sum + Number(item.amountPaid || 0), 0);
   const dashboardMetrics = [
     {
       title: "Today’s Total Appointments",
@@ -434,7 +432,7 @@ export default function StaffDashboard({ currentUser, onLogout }) {
   const billingSummary = [
     { title: "Invoices Total", value: String(billingRecords.length) },
     { title: "Collected", value: formatBaht(totalCollected) },
-    { title: "Pending", value: formatBaht(totalPending) },
+    { title: "Unpaid Balance", value: formatBaht(totalPending) },
   ];
   useEffect(() => {
     let cancelled = false;
@@ -1519,7 +1517,9 @@ export default function StaffDashboard({ currentUser, onLogout }) {
       consultationFee: Number(formData.get("consultationFee") || 0),
       serviceCharges: Number(formData.get("serviceCharges") || 0),
       medicineCharges: Number(formData.get("medicineCharges") || 0),
-      labCharges: 0,
+      labCharges: Number(formData.get("labCharges") || 0),
+      taxAmount: Number(formData.get("taxAmount") || 0),
+      discountAmount: Number(formData.get("discountAmount") || 0),
     };
 
     try {
@@ -1554,7 +1554,9 @@ export default function StaffDashboard({ currentUser, onLogout }) {
     const payload = {
       paymentMethod: String(formData.get("paymentMethod") || "").trim(),
       paymentDate: String(formData.get("paymentDate") || "").trim(),
-      paymentStatus: String(formData.get("paymentStatus") || "Pending").trim(),
+      referenceNumber: String(formData.get("referenceNumber") || "").trim(),
+      paymentAmount: Number(formData.get("paymentAmount") || 0),
+      paymentStatus: String(formData.get("paymentStatus") || "").trim(),
     };
 
     try {
@@ -1592,7 +1594,12 @@ export default function StaffDashboard({ currentUser, onLogout }) {
     const serviceCharges = Number(receipt.serviceCharges || 0);
     const medicineCharges = Number(receipt.medicineCharges || 0);
     const labCharges = Number(receipt.labCharges || 0);
+    const taxAmount = Number(receipt.taxAmount || 0);
+    const discountAmount = Number(receipt.discountAmount || 0);
+    const subTotal = Number(receipt.subTotal || 0);
     const totalAmount = Number(receipt.totalAmount || 0);
+    const amountPaid = Number(receipt.amountPaid || 0);
+    const balanceDue = Number(receipt.balanceDue || 0);
     const printedAt = new Date().toLocaleString("en-US");
     const staffName = String(profile?.name || currentUser?.name || "Staff");
 
@@ -1631,7 +1638,7 @@ export default function StaffDashboard({ currentUser, onLogout }) {
         </div>
         <div class="meta">
           <div><strong>Invoice:</strong> ${escapeHtml(
-            receipt.invoiceId || "-"
+            receipt.invoiceNumber || receipt.invoiceId || "-"
           )}</div>
           <div><strong>Appointment:</strong> ${escapeHtml(
             formatAppointmentReference(receipt.appointmentId)
@@ -1673,8 +1680,23 @@ export default function StaffDashboard({ currentUser, onLogout }) {
             <tr><td>Lab Charges</td><td>${escapeHtml(
               formatBaht(labCharges)
             )}</td></tr>
+            <tr><td>Subtotal</td><td>${escapeHtml(
+              formatBaht(subTotal)
+            )}</td></tr>
+            <tr><td>Tax</td><td>${escapeHtml(
+              formatBaht(taxAmount)
+            )}</td></tr>
+            <tr><td>Discount</td><td>${escapeHtml(
+              formatBaht(discountAmount)
+            )}</td></tr>
             <tr class="total"><td>Total</td><td>${escapeHtml(
               formatBaht(totalAmount)
+            )}</td></tr>
+            <tr><td>Paid</td><td>${escapeHtml(
+              formatBaht(amountPaid)
+            )}</td></tr>
+            <tr class="total"><td>Balance</td><td>${escapeHtml(
+              formatBaht(balanceDue)
             )}</td></tr>
           </tbody>
         </table>
@@ -1690,6 +1712,9 @@ export default function StaffDashboard({ currentUser, onLogout }) {
           )}</div>
           <div class="label">Date</div><div class="value">${escapeHtml(
             receipt.paymentDate || "-"
+          )}</div>
+          <div class="label">Reference</div><div class="value">${escapeHtml(
+            receipt.referenceNumber || "-"
           )}</div>
           <div class="label">Processed By</div><div class="value">${escapeHtml(
             staffName
@@ -2727,7 +2752,7 @@ export default function StaffDashboard({ currentUser, onLogout }) {
                 <h3>Generate Invoice</h3>
                 <div className="st-profile-form">
                   <label>
-                    Invoice ID
+                    Invoice Number
                     <input
                       name="invoiceId"
                       type="text"
@@ -2801,7 +2826,7 @@ export default function StaffDashboard({ currentUser, onLogout }) {
                       {billingRecords.length ? (
                         billingRecords.map((item) => (
                           <option key={item.id} value={item.id}>
-                            {item.invoiceId} | {item.ownerName} | {item.petName}
+                            {(item.invoiceNumber || item.invoiceId)} | {item.ownerName} | {item.petName}
                           </option>
                         ))
                       ) : (
@@ -2841,12 +2866,48 @@ export default function StaffDashboard({ currentUser, onLogout }) {
                       defaultValue={selectedBillingRecord?.medicineCharges || 0}
                     />
                   </label>
+                  <label>
+                    Lab Charges
+                    <input
+                      name="labCharges"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      defaultValue={selectedBillingRecord?.labCharges || 0}
+                    />
+                  </label>
+                  <label>
+                    Tax
+                    <input
+                      name="taxAmount"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      defaultValue={selectedBillingRecord?.taxAmount || 0}
+                    />
+                  </label>
+                  <label>
+                    Discount
+                    <input
+                      name="discountAmount"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      defaultValue={selectedBillingRecord?.discountAmount || 0}
+                    />
+                  </label>
+                </div>
+                <div className="st-billing-total">
+                  <span>Subtotal</span>
+                  <strong>{selectedBillingRecord?.subTotalDisplay || "฿0.00"}</strong>
                 </div>
                 <div className="st-billing-total">
                   <span>Total Amount</span>
-                  <strong>
-                    {selectedBillingRecord?.totalAmountDisplay || "฿0.00"}
-                  </strong>
+                  <strong>{selectedBillingRecord?.totalAmountDisplay || "฿0.00"}</strong>
+                </div>
+                <div className="st-billing-total">
+                  <span>Unpaid Balance</span>
+                  <strong>{selectedBillingRecord?.balanceDueDisplay || "฿0.00"}</strong>
                 </div>
                 <button
                   type="submit"
@@ -2874,9 +2935,18 @@ export default function StaffDashboard({ currentUser, onLogout }) {
                     >
                       <option>Card</option>
                       <option>Cash</option>
-                      <option>UPI</option>
-                      <option>Bank Transfer</option>
+                      <option>Transfer</option>
                     </select>
+                  </label>
+                  <label>
+                    Payment Amount
+                    <input
+                      name="paymentAmount"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      defaultValue={selectedBillingRecord?.balanceDue || 0}
+                    />
                   </label>
                   <label>
                     Payment Date
@@ -2887,17 +2957,33 @@ export default function StaffDashboard({ currentUser, onLogout }) {
                     />
                   </label>
                   <label>
+                    Reference Number
+                    <input
+                      name="referenceNumber"
+                      type="text"
+                      defaultValue={selectedBillingRecord?.referenceNumber || ""}
+                      placeholder="Card slip / transfer ref"
+                    />
+                  </label>
+                  <label>
                     Payment Status
                     <select
                       name="paymentStatus"
-                      defaultValue={
-                        selectedBillingRecord?.paymentStatus || "Paid"
-                      }
+                      defaultValue=""
                     >
-                      <option>Paid</option>
-                      <option>Pending</option>
+                      <option value="">Auto (from paid amount)</option>
+                      <option>Failed</option>
+                      <option>Unpaid</option>
                     </select>
                   </label>
+                </div>
+                <div className="st-billing-total">
+                  <span>Already Paid</span>
+                  <strong>{selectedBillingRecord?.amountPaidDisplay || "฿0.00"}</strong>
+                </div>
+                <div className="st-billing-total">
+                  <span>Current Balance</span>
+                  <strong>{selectedBillingRecord?.balanceDueDisplay || "฿0.00"}</strong>
                 </div>
                 <div className="st-billing-actions">
                   <button
@@ -2935,11 +3021,15 @@ export default function StaffDashboard({ currentUser, onLogout }) {
                     billingRecords.map((item) => (
                       <li key={item.id}>
                         <div>
-                          <strong>{item.invoiceId}</strong>
+                          <strong>{item.invoiceNumber || item.invoiceId}</strong>
                           <p>
                             {item.ownerName} | {item.petName}
                           </p>
                           <p>Doctor: {item.doctorName || "-"}</p>
+                          <p>
+                            Paid: {item.amountPaidDisplay || formatBaht(item.amountPaid)} | Balance:{" "}
+                            {item.balanceDueDisplay || formatBaht(item.balanceDue)}
+                          </p>
                         </div>
                         <span>
                           {item.totalAmountDisplay ||
