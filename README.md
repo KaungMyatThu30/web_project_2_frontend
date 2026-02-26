@@ -249,7 +249,7 @@ Without this, login/API requests may return `405 Not Allowed`.
 ## Project Structure
 
 ```text
-WEB_PROJECT_02
+
 ├── web_project_2_frontend/
 │   ├── public/
 │   ├── src/
@@ -278,7 +278,6 @@ WEB_PROJECT_02
 │   │   └── sever.js
 │   ├── package.json
 │   └── Dockerfile
-└── README.md
 ```
 
 ---
