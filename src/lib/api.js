@@ -244,3 +244,20 @@ export function createMedicalRecord(body) {
     body: JSON.stringify(body),
   });
 }
+
+export function listVaccinations(query) {
+  return request(withQuery("/api/vaccinations", query));
+}
+
+export function createVaccination(body) {
+  return request("/api/vaccinations", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+export function deleteVaccinationById(vaccinationId) {
+  return request(`/api/vaccinations/${vaccinationId}`, {
+    method: "DELETE",
+  });
+}

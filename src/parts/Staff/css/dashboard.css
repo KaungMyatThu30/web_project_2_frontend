@@ -654,6 +654,60 @@
     font-weight: 700; 
     color: #8b3131; 
     } 
+
+    .st-vaccination-helper {
+    margin-top: 6px !important;
+    font-size: 12px !important;
+    color: #6b4a2f !important;
+    }
+
+    .st-vaccination-stats {
+    margin-top: 10px;
+    display: grid;
+    gap: 8px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .st-vaccination-stat {
+    border-radius: 10px;
+    border: 1px solid rgba(107, 74, 47, 0.2);
+    background: rgba(255, 255, 255, 0.62);
+    padding: 10px;
+    }
+
+    .st-vaccination-stat p {
+    margin: 0;
+    font-size: 12px;
+    }
+
+    .st-vaccination-stat strong {
+    margin-top: 5px;
+    display: block;
+    font-size: 24px;
+    line-height: 1;
+    color: #8b5e34;
+    }
+
+    .st-vaccination-form {
+    grid-template-columns: 1fr;
+    }
+
+    .st-vaccination-submit {
+    width: 100%;
+    min-height: 40px;
+    }
+
+    .st-vaccination-search {
+    grid-template-columns: 1fr;
+    }
+
+    .st-vaccination-list li {
+    align-items: start;
+    }
+
+    .st-vaccination-empty p {
+    margin-top: 4px;
+    }
      
     .st-toggle-list { 
     margin-top: 10px; 
@@ -1035,5 +1089,18 @@
     grid-template-columns: repeat(4, minmax(0, 1fr)); 
     align-items: center; 
     } 
+
+    .st-vaccination-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .st-vaccination-form {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .st-vaccination-submit {
+    grid-column: 3;
+    min-height: 34px;
+    }
     } 
      

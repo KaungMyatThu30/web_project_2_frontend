@@ -19,6 +19,9 @@ import {
   listReportSnapshots,
   listAppointments,
   listPets,
+  listVaccinations,
+  createVaccination,
+  deleteVaccinationById,
   getReportsAnalytics,
   listUsers,
   recordBillingPaymentById,
@@ -210,6 +213,55 @@ function normalizeIsoDate(value) {
   return parsed.toISOString().slice(0, 10);
 }
 
+function parseIsoDate(value) {
+  const normalized = normalizeIsoDate(value);
+  if (!normalized) {
+    return null;
+  }
+  const parsed = new Date(`${normalized}T00:00:00`);
+  if (Number.isNaN(parsed.getTime())) {
+    return null;
+  }
+  return parsed;
+}
+
+function getDaysUntilDate(value) {
+  const target = parseIsoDate(value);
+  if (!target) {
+    return Number.NaN;
+  }
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const diffMs = target.getTime() - today.getTime();
+  return Math.floor(diffMs / 86_400_000);
+}
+
+function getVaccinationDueState(nextDueDate) {
+  const daysUntil = getDaysUntilDate(nextDueDate);
+  if (!Number.isFinite(daysUntil)) {
+    return { label: "Unknown", className: "st-history-pending" };
+  }
+  if (daysUntil < 0) {
+    return { label: "Overdue", className: "st-history-cancelled" };
+  }
+  if (daysUntil <= 14) {
+    return { label: "Due Soon", className: "st-history-pending" };
+  }
+  return { label: "Up to Date", className: "st-history-completed" };
+}
+
+function formatUiDate(value) {
+  const parsed = parseIsoDate(value);
+  if (!parsed) {
+    return "-";
+  }
+  return parsed.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
 function formatOwnerReference(ownerId) {
   const rawId = String(ownerId || "").trim();
   if (!rawId) {
@@ -288,6 +340,7 @@ export default function StaffDashboard({ currentUser, onLogout }) {
   const [vaccinationSearch, setVaccinationSearch] = useState("");
   const [vaccinationError, setVaccinationError] = useState("");
   const [vaccinationStatusMessage, setVaccinationStatusMessage] = useState("");
+  const [isLoadingVaccinations, setIsLoadingVaccinations] = useState(false);
   const [doctors, setDoctors] = useState([]);
   const [availableDoctorCount, setAvailableDoctorCount] = useState(0);
   const [selectedDoctorId, setSelectedDoctorId] = useState("");
@@ -413,6 +466,23 @@ export default function StaffDashboard({ currentUser, onLogout }) {
       item.vaccineName.toLowerCase().includes(query)
     );
   });
+  const sortedVaccinations = [...filteredVaccinations].sort((a, b) =>
+    String(a.nextDueDate || "").localeCompare(String(b.nextDueDate || ""))
+  );
+  const vaccinationStats = vaccinations.reduce(
+    (summary, item) => {
+      const dueState = getVaccinationDueState(item.nextDueDate).label;
+      if (dueState === "Overdue") {
+        summary.overdue += 1;
+      } else if (dueState === "Due Soon") {
+        summary.dueSoon += 1;
+      } else if (dueState === "Up to Date") {
+        summary.upToDate += 1;
+      }
+      return summary;
+    },
+    { overdue: 0, dueSoon: 0, upToDate: 0 }
+  );
   const selectedDoctor =
     doctors.find((doctor) => doctor.id === selectedDoctorId) || null;
   const availableSlots = Array.isArray(doctorSchedule?.availableSlots)
@@ -489,36 +559,48 @@ export default function StaffDashboard({ currentUser, onLogout }) {
     };
   }, []);
 
+  const loadVaccinationData = async () => {
+    const response = await listVaccinations();
+    const items = Array.isArray(response?.vaccinations)
+      ? response.vaccinations
+      : [];
+    return items.map((item) => ({
+      id: String(item.id || ""),
+      vaccineId: String(item.vaccineId || ""),
+      petId: String(item.petId || ""),
+      vaccineName: String(item.vaccineName || ""),
+      dateGiven: normalizeIsoDate(item.dateGiven),
+      nextDueDate: normalizeIsoDate(item.nextDueDate),
+    }));
+  };
+
   useEffect(() => {
-    const raw = window.localStorage.getItem("staff-vaccination-records");
-    if (!raw) {
-      return;
-    }
-    try {
-      const parsed = JSON.parse(raw);
-      if (!Array.isArray(parsed)) {
-        return;
+    let cancelled = false;
+
+    const loadVaccinationsData = async () => {
+      try {
+        setIsLoadingVaccinations(true);
+        setVaccinationError("");
+        const items = await loadVaccinationData();
+        if (!cancelled) {
+          setVaccinations(items);
+        }
+      } catch (requestError) {
+        if (!cancelled) {
+          setVaccinations([]);
+          setVaccinationError(requestError.message);
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoadingVaccinations(false);
+        }
       }
-      const normalized = parsed
-        .map((item) => ({
-          vaccineId: String(item?.vaccineId || "").trim(),
-          petId: String(item?.petId || "").trim(),
-          vaccineName: String(item?.vaccineName || "").trim(),
-          dateGiven: normalizeIsoDate(item?.dateGiven),
-          nextDueDate: normalizeIsoDate(item?.nextDueDate),
-        }))
-        .filter(
-          (item) =>
-            item.vaccineId &&
-            item.petId &&
-            item.vaccineName &&
-            item.dateGiven &&
-            item.nextDueDate
-        );
-      setVaccinations(normalized);
-    } catch (_error) {
-      setVaccinations([]);
-    }
+    };
+
+    loadVaccinationsData();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const loadBillingData = async () => {
@@ -1332,14 +1414,7 @@ export default function StaffDashboard({ currentUser, onLogout }) {
     setPetHistoryModalPet(pet);
   };
 
-  const saveVaccinationRecords = (items) => {
-    window.localStorage.setItem(
-      "staff-vaccination-records",
-      JSON.stringify(items)
-    );
-  };
-
-  const handleCreateVaccinationRecord = (event) => {
+  const handleCreateVaccinationRecord = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const vaccineId = String(formData.get("vaccineId") || "").trim();
@@ -1368,35 +1443,60 @@ export default function StaffDashboard({ currentUser, onLogout }) {
       return;
     }
 
-    const nextItems = [
-      {
+    try {
+      setVaccinationError("");
+      setVaccinationStatusMessage("");
+      const response = await createVaccination({
         vaccineId,
         petId,
         vaccineName,
         dateGiven,
         nextDueDate,
-      },
-      ...vaccinations,
-    ];
-    setVaccinations(nextItems);
-    saveVaccinationRecords(nextItems);
-    setVaccinationError("");
-    setVaccinationStatusMessage("Vaccination record added.");
-    event.currentTarget.reset();
+      });
+      const created = response?.vaccination;
+      if (created?.id) {
+        setVaccinations((current) => [
+          {
+            id: String(created.id || ""),
+            vaccineId: String(created.vaccineId || vaccineId),
+            petId: String(created.petId || petId),
+            vaccineName: String(created.vaccineName || vaccineName),
+            dateGiven: normalizeIsoDate(created.dateGiven || dateGiven),
+            nextDueDate: normalizeIsoDate(created.nextDueDate || nextDueDate),
+          },
+          ...current,
+        ]);
+      } else {
+        const items = await loadVaccinationData();
+        setVaccinations(items);
+      }
+      setVaccinationStatusMessage("Vaccination record added.");
+      event.currentTarget.reset();
+    } catch (requestError) {
+      setVaccinationError(requestError.message);
+    }
   };
 
-  const handleDeleteVaccinationRecord = (vaccineId) => {
+  const handleDeleteVaccinationRecord = async (item) => {
+    if (!item?.id) {
+      setVaccinationError("Vaccination record ID is missing.");
+      return;
+    }
     const confirmed = window.confirm(
-      `Delete vaccination record ${vaccineId}? This action cannot be undone.`
+      `Delete vaccination record ${item.vaccineId}? This action cannot be undone.`
     );
     if (!confirmed) {
       return;
     }
-    const nextItems = vaccinations.filter((item) => item.vaccineId !== vaccineId);
-    setVaccinations(nextItems);
-    saveVaccinationRecords(nextItems);
-    setVaccinationError("");
-    setVaccinationStatusMessage("Vaccination record deleted.");
+    try {
+      setVaccinationError("");
+      setVaccinationStatusMessage("");
+      await deleteVaccinationById(item.id);
+      setVaccinations((current) => current.filter((row) => row.id !== item.id));
+      setVaccinationStatusMessage("Vaccination record deleted.");
+    } catch (requestError) {
+      setVaccinationError(requestError.message);
+    }
   };
 
   const handleStaffNotificationSubmit = async (event) => {
@@ -2524,47 +2624,76 @@ export default function StaffDashboard({ currentUser, onLogout }) {
           ) : activePage === "Vaccination" ? (
             <div className="st-appointments">
               <article className="st-card">
+                <h3>Vaccination Overview</h3>
+                <div className="st-vaccination-stats">
+                  <div className="st-vaccination-stat">
+                    <p>Total Records</p>
+                    <strong>{vaccinations.length}</strong>
+                  </div>
+                  <div className="st-vaccination-stat">
+                    <p>Overdue</p>
+                    <strong>{vaccinationStats.overdue}</strong>
+                  </div>
+                  <div className="st-vaccination-stat">
+                    <p>Due Soon (14 days)</p>
+                    <strong>{vaccinationStats.dueSoon}</strong>
+                  </div>
+                  <div className="st-vaccination-stat">
+                    <p>Up to Date</p>
+                    <strong>{vaccinationStats.upToDate}</strong>
+                  </div>
+                </div>
+              </article>
+
+              <article className="st-card">
                 <h3>Add Vaccination Record</h3>
+                <p className="st-vaccination-helper">
+                  Save each dose with a clear due date so staff can follow up on
+                  time.
+                </p>
                 <form
-                  className="st-filters"
+                  className="st-filters st-vaccination-form"
                   onSubmit={handleCreateVaccinationRecord}
                 >
                   <label>
-                    vaccineId
+                    Vaccine ID
                     <input
                       name="vaccineId"
                       type="text"
-                      placeholder="Enter vaccine ID"
+                      placeholder="e.g. VAC-000123"
                       required
                     />
                   </label>
                   <label>
-                    petId
+                    Pet ID
                     <input
                       name="petId"
                       type="text"
-                      placeholder="Enter pet ID"
+                      placeholder="e.g. PET-000777"
                       required
                     />
                   </label>
                   <label>
-                    vaccineName
+                    Vaccine Name
                     <input
                       name="vaccineName"
                       type="text"
-                      placeholder="Enter vaccine name"
+                      placeholder="e.g. Rabies Booster"
                       required
                     />
                   </label>
                   <label>
-                    dateGiven
+                    Date Given
                     <input name="dateGiven" type="date" required />
                   </label>
                   <label>
-                    nextDueDate
+                    Next Due Date
                     <input name="nextDueDate" type="date" required />
                   </label>
-                  <button type="submit" className="st-plain-btn">
+                  <button
+                    type="submit"
+                    className="st-plain-btn st-vaccination-submit"
+                  >
                     Save Vaccination Record
                   </button>
                 </form>
@@ -2578,46 +2707,67 @@ export default function StaffDashboard({ currentUser, onLogout }) {
 
               <article className="st-card">
                 <h3>Vaccination Records</h3>
-                <div className="st-filters">
+                <div className="st-filters st-vaccination-search">
                   <label>
-                    Search vaccination
+                    Search Records
                     <input
                       type="text"
                       value={vaccinationSearch}
-                      placeholder="Search by vaccineId, petId, or vaccineName"
+                      placeholder="Search by Vaccine ID, Pet ID, or Vaccine Name"
                       onChange={(event) =>
                         setVaccinationSearch(event.target.value)
                       }
                     />
                   </label>
                 </div>
-                <ul className="st-appointment-list">
-                  {filteredVaccinations.length ? (
-                    filteredVaccinations.map((item) => (
-                      <li key={item.vaccineId}>
-                        <div>
-                          <strong>{item.vaccineId}</strong>
-                          <p>petId: {item.petId}</p>
-                          <p>vaccineName: {item.vaccineName}</p>
-                          <p>dateGiven: {item.dateGiven}</p>
-                          <p>nextDueDate: {item.nextDueDate}</p>
-                        </div>
-                        <div className="st-appointment-actions">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleDeleteVaccinationRecord(item.vaccineId)
-                            }
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </li>
-                    ))
-                  ) : (
+                <ul className="st-appointment-list st-vaccination-list">
+                  {isLoadingVaccinations ? (
                     <li>
                       <div>
-                        <strong>No vaccination records found.</strong>
+                        <strong>Loading vaccination records...</strong>
+                      </div>
+                    </li>
+                  ) : sortedVaccinations.length ? (
+                    sortedVaccinations.map((item) => {
+                      const dueState = getVaccinationDueState(item.nextDueDate);
+                      const daysUntil = getDaysUntilDate(item.nextDueDate);
+                      return (
+                        <li key={item.id || item.vaccineId}>
+                          <div>
+                            <strong>{item.vaccineId}</strong>
+                            <p>Pet ID: {item.petId}</p>
+                            <p>Vaccine: {item.vaccineName}</p>
+                            <p>Date Given: {formatUiDate(item.dateGiven)}</p>
+                            <p>Next Due: {formatUiDate(item.nextDueDate)}</p>
+                            <span
+                              className={`st-history-status ${dueState.className}`}
+                            >
+                              {dueState.label}
+                              {Number.isFinite(daysUntil)
+                                ? ` (${daysUntil} day${
+                                    daysUntil === 1 ? "" : "s"
+                                  })`
+                                : ""}
+                            </span>
+                          </div>
+                          <div className="st-appointment-actions">
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteVaccinationRecord(item)}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </li>
+                      );
+                    })
+                  ) : (
+                    <li className="st-vaccination-empty">
+                      <div>
+                        <strong>No vaccination records yet.</strong>
+                        <p>
+                          Add the first record above to start tracking due dates.
+                        </p>
                       </div>
                     </li>
                   )}
@@ -2821,6 +2971,17 @@ export default function StaffDashboard({ currentUser, onLogout }) {
                   )}
                 </ul>
               </form>
+
+              <article className="st-card">
+                <h3>Doctor Schedule Snapshot</h3>
+                <p>Available slots: {availableSlots.length}</p>
+                <p>Blocked slots: {blockedSlots.length}</p>
+                <p>Emergency slots: {emergencySlots.length}</p>
+                <p>
+                  Clinic Hours: {clinicHours.mondayFriday} | {clinicHours.saturday} |{" "}
+                  {clinicHours.sunday}
+                </p>
+              </article>
             </div>
           ) : activePage === "Profile" ? (
             <div className="st-profile-layout">
