@@ -1,4 +1,4 @@
-import '../../styles/login/loginoption.css'
+import '../../styles/Login/loginoption.css'
 import logoImage from '../../../images/Web_Logo.png'
 
 export default function LoginOption({ onLoginClick, onCreateAccountClick }) {
