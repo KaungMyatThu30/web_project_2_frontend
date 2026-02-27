@@ -30,6 +30,7 @@ import {
   updateUserProfile,
 } from "../../../lib/api";
 import { formatAppointmentReference } from "../../../lib/appointmentRef";
+import { compressImageFileToDataUrl } from "../../../lib/imageUpload";
 
 const STAFF_PAGES = [
   "Dashboard",
@@ -879,12 +880,7 @@ export default function StaffDashboard({ currentUser, onLogout }) {
     let profilePhoto = String(profile?.profilePhoto || "");
     const photoFile = formData.get("profilePhoto");
     if (photoFile instanceof File && photoFile.size > 0) {
-      profilePhoto = await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(String(reader.result || ""));
-        reader.onerror = () => reject(new Error("Unable to read image file."));
-        reader.readAsDataURL(photoFile);
-      });
+      profilePhoto = await compressImageFileToDataUrl(photoFile);
     }
     const updates = {
       name: String(formData.get("name") || "").trim(),

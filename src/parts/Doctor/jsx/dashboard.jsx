@@ -19,6 +19,7 @@ import {
   updateUserProfile,
 } from "../../../lib/api";
 import { formatAppointmentReference } from "../../../lib/appointmentRef";
+import { compressImageFileToDataUrl } from "../../../lib/imageUpload";
 
 const DOCTOR_PAGES = [
   "Doctor Dashboard",
@@ -530,16 +531,18 @@ export default function DoctorDashboard({ currentUser, onLogout }) {
     });
   }, [consultationAppointments]);
 
-  const handlePhotoChange = (event) => {
+  const handlePhotoChange = async (event) => {
     const file = event.target.files?.[0];
     if (!file) {
       return;
     }
-    const reader = new FileReader();
-    reader.onload = () => {
-      setDoctorPhotoPreview(String(reader.result || ""));
-    };
-    reader.readAsDataURL(file);
+    try {
+      const compressed = await compressImageFileToDataUrl(file);
+      setDoctorPhotoPreview(compressed);
+      setProfileError("");
+    } catch (_error) {
+      setProfileError("Unable to read image file.");
+    }
   };
 
   const handleProfileSubmit = async (event) => {

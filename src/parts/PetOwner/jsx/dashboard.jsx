@@ -16,6 +16,7 @@ import {
   updateUserProfile,
 } from "../../../lib/api";
 import { formatAppointmentReference } from "../../../lib/appointmentRef";
+import { compressImageFileToDataUrl } from "../../../lib/imageUpload";
 
 const SIDEBAR_ITEMS = [
   { id: "Dashboard", label: "Dashboard", icon: "🏠" },
@@ -1571,21 +1572,13 @@ function ProfilePage({
   passwordError,
   passwordStatus,
 }) {
-  const toDataUrl = (file) =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(String(reader.result || ""));
-      reader.onerror = () => reject(new Error("Unable to read image file."));
-      reader.readAsDataURL(file);
-    });
-
   const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     let profilePhoto = String(profile?.profilePhoto || "");
     const photoFile = formData.get("profilePhoto");
     if (photoFile instanceof File && photoFile.size > 0) {
-      profilePhoto = await toDataUrl(photoFile);
+      profilePhoto = await compressImageFileToDataUrl(photoFile);
     }
     await onSaveProfile({
       name: String(formData.get("name") || "").trim(),
