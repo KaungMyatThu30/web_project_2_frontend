@@ -483,6 +483,17 @@ export default function StaffDashboard({ currentUser, onLogout }) {
     },
     { overdue: 0, dueSoon: 0, upToDate: 0 }
   );
+  const petLookup = pets.reduce((accumulator, pet) => {
+    accumulator[String(pet.id || "")] = pet;
+    return accumulator;
+  }, {});
+  const ownerLookup = owners.reduce((accumulator, owner) => {
+    accumulator[String(owner.id || "")] = owner;
+    return accumulator;
+  }, {});
+  const linkedVaccinatedPetCount = new Set(
+    vaccinations.map((item) => String(item.petId || ""))
+  ).size;
   const selectedDoctor =
     doctors.find((doctor) => doctor.id === selectedDoctorId) || null;
   const availableSlots = Array.isArray(doctorSchedule?.availableSlots)
@@ -1422,9 +1433,15 @@ export default function StaffDashboard({ currentUser, onLogout }) {
     const vaccineName = String(formData.get("vaccineName") || "").trim();
     const dateGiven = normalizeIsoDate(formData.get("dateGiven"));
     const nextDueDate = normalizeIsoDate(formData.get("nextDueDate"));
+    const selectedPet = petLookup[petId];
 
     if (!vaccineId || !petId || !vaccineName || !dateGiven || !nextDueDate) {
       setVaccinationError("All vaccination fields are required.");
+      setVaccinationStatusMessage("");
+      return;
+    }
+    if (!selectedPet) {
+      setVaccinationError("Please select a valid pet from pet records.");
       setVaccinationStatusMessage("");
       return;
     }
@@ -1469,6 +1486,15 @@ export default function StaffDashboard({ currentUser, onLogout }) {
       } else {
         const items = await loadVaccinationData();
         setVaccinations(items);
+      }
+      try {
+        await updatePetById(selectedPet.id, {
+          vaccinationStatus: `${vaccineName} | Given: ${dateGiven} | Next due: ${nextDueDate}`,
+          auditActorId: String(profile?.id || currentUser?.id || "").trim(),
+          auditActorName: String(profile?.name || currentUser?.name || "").trim(),
+          auditActorRole: "staff",
+        });
+      } catch (_syncError) {
       }
       setVaccinationStatusMessage("Vaccination record added.");
       event.currentTarget.reset();
@@ -2631,6 +2657,18 @@ export default function StaffDashboard({ currentUser, onLogout }) {
                     <strong>{vaccinations.length}</strong>
                   </div>
                   <div className="st-vaccination-stat">
+                    <p>Linked Pets</p>
+                    <strong>{linkedVaccinatedPetCount}</strong>
+                  </div>
+                  <div className="st-vaccination-stat">
+                    <p>Total Pets (pet_data)</p>
+                    <strong>{pets.length}</strong>
+                  </div>
+                  <div className="st-vaccination-stat">
+                    <p>Total Owners (users)</p>
+                    <strong>{owners.length}</strong>
+                  </div>
+                  <div className="st-vaccination-stat">
                     <p>Overdue</p>
                     <strong>{vaccinationStats.overdue}</strong>
                   </div>
@@ -2665,13 +2703,22 @@ export default function StaffDashboard({ currentUser, onLogout }) {
                     />
                   </label>
                   <label>
-                    Pet ID
-                    <input
+                    Pet (from pet_data)
+                    <select
                       name="petId"
-                      type="text"
-                      placeholder="e.g. PET-000777"
+                      defaultValue=""
                       required
-                    />
+                    >
+                      <option value="" disabled>
+                        {isLoadingPets ? "Loading pets..." : "Select pet"}
+                      </option>
+                      {pets.map((pet) => (
+                        <option key={pet.id} value={pet.id}>
+                          {pet.name} ({formatPetReference(pet.id)}) -{" "}
+                          {pet.ownerName || pet.ownerId || "-"}
+                        </option>
+                      ))}
+                    </select>
                   </label>
                   <label>
                     Vaccine Name
@@ -2735,7 +2782,17 @@ export default function StaffDashboard({ currentUser, onLogout }) {
                         <li key={item.id || item.vaccineId}>
                           <div>
                             <strong>{item.vaccineId}</strong>
-                            <p>Pet ID: {item.petId}</p>
+                            <p>
+                              Pet: {petLookup[item.petId]?.name || "-"} (
+                              {formatPetReference(item.petId)})
+                            </p>
+                            <p>
+                              Owner:{" "}
+                              {petLookup[item.petId]?.ownerName ||
+                                ownerLookup[petLookup[item.petId]?.ownerId]
+                                  ?.name ||
+                                "-"}
+                            </p>
                             <p>Vaccine: {item.vaccineName}</p>
                             <p>Date Given: {formatUiDate(item.dateGiven)}</p>
                             <p>Next Due: {formatUiDate(item.nextDueDate)}</p>
