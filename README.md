@@ -137,9 +137,9 @@ Create `.env` or `.env.local`:
 
 ```env
 PORT=5001
-MONGODB_URI=your_mongodb_uri
-PETS_MONGODB_URI=your_mongodb_uri
-FRONTEND_URL=http://localhost:5173
+MONGODB_URI=mongodb+srv://Lynn198:1234@cluster0.xtk7ypf.mongodb.net/Web_Project_2?appName=Cluster0
+PETS_MONGODB_URI=mongodb+srv://Lynn198:1234@cluster0.xtk7ypf.mongodb.net/Web_Project_2?appName=Cluster0
+FRONTEND_URL=https://pawever.koreacentral.cloudapp.azure.com
 ```
 
 Run backend:
@@ -158,7 +158,7 @@ npm install
 Create `.env`:
 
 ```env
-VITE_API_BASE_URL=http://localhost:5001
+VITE_API_BASE_URL=https://pawever.koreacentral.cloudapp.azure.com
 ```
 
 Run frontend:
@@ -169,7 +169,7 @@ npm run dev
 
 Open:
 
-- `http://localhost:5173`
+- `https://pawever.koreacentral.cloudapp.azure.com`
 
 ### 4. Build for production
 
@@ -208,9 +208,9 @@ sudo docker run -d \
   --network pawever-net \
   -p 5001:5001 \
   -e PORT=5001 \
-  -e FRONTEND_URL=http://lynn-server.koreacentral.cloudapp.azure.com \
-  -e MONGODB_URI='YOUR_REAL_URI' \
-  -e PETS_MONGODB_URI='YOUR_REAL_URI' \
+  -e FRONTEND_URL=https://pawever.koreacentral.cloudapp.azure.com \
+  -e MONGODB_URI='mongodb+srv://Lynn198:1234@cluster0.xtk7ypf.mongodb.net/Web_Project_2?appName=Cluster0' \
+  -e PETS_MONGODB_URI='mongodb+srv://Lynn198:1234@cluster0.xtk7ypf.mongodb.net/Web_Project_2?appName=Cluster0' \
   backend:1.0
 ```
 
