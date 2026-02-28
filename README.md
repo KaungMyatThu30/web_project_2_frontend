@@ -96,7 +96,7 @@ Staff can manage operations:
 ---
 ## Deploy Link
 
-- Azure VM: [http://lynn-server.koreacentral.cloudapp.azure.com](http://lynn-server.koreacentral.cloudapp.azure.com)
+- Azure VM: [https://pawever.koreacentral.cloudapp.azure.com](https://pawever.koreacentral.cloudapp.azure.com)
 
 ---
 ## Technology Stack
